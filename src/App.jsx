@@ -50,6 +50,15 @@ function AppContent() {
         <>
             <Navbar openModal={openModal} />
 
+            <Modal show={modalType !== null} onClose={closeModal}>
+                {modalType === "login" && (
+                    <Login onClose={closeModal} toggleModal={() => setModalType("register")} />
+                )}
+                {modalType === "register" && (
+                    <Register onClose={closeModal} toggleModal={() => setModalType("login")} />
+                )}
+            </Modal>
+
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Home />} />
@@ -119,14 +128,7 @@ function AppContent() {
                 <Route path="*" element={<NotFound />} />
             </Routes>
 
-            <Modal show={modalType !== null} onClose={closeModal}>
-                {modalType === "login" && (
-                    <Login onClose={closeModal} toggleModal={() => setModalType("register")} />
-                )}
-                {modalType === "register" && (
-                    <Register onClose={closeModal} toggleModal={() => setModalType("login")} />
-                )}
-            </Modal>
+
 
             <Footer />
 
