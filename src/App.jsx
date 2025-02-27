@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, useSearchParams } from "react-router-dom"
 import Home from "./pages/Home.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import Navbar from "./components/Navbar.jsx";
+import Navbar from "./components/NavBar.jsx";
 import Footer from "./components/Footer.jsx";
 import Login from "./pages/Login.jsx";
 import OrderDetail from "./components/OrderDetail.jsx";
@@ -21,7 +21,6 @@ import Register from "./pages/Register.jsx";
 import Modal from "./components/Modal.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
 import ProductsDetail from "./components/ProductsDetail.jsx";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
