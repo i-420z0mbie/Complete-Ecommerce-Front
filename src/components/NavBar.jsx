@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 const Navbar = ({ openModal }) => {
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState({});
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [subSubcategories, setSubSubcategories] = useState({});
     const [activeCategory, setActiveCategory] = useState(null);
     const [activeSubcategory, setActiveSubcategory] = useState(null);
@@ -31,6 +32,10 @@ const Navbar = ({ openModal }) => {
 
     // Use a single ref for hover timeouts
     const hoverTimeoutRef = useRef(null);
+
+    const toggleMobileMenu = () => {
+        setShowMobileMenu(!showMobileMenu);
+    };
 
     // Custom hover handlers allowing for an optional delay parameter.
     const handleMouseEnter = useCallback((setState, value, delay = 100) => {
@@ -210,7 +215,83 @@ const Navbar = ({ openModal }) => {
     }
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark ali-nav">
+        <nav className="navbar navbar-dark bg-dark ali-nav">
+            {/* Mobile Top Row */}
+            <div className="container-fluid mobile-top-row">
+                <button
+                    className="navbar-toggler"
+                    type="button"
+                    onClick={toggleMobileMenu}
+                    aria-label="Toggle navigation"
+                >
+                    <i className="bi bi-list"></i>
+                </button>
+
+                <a className="navbar-brand" href="/">
+                    z0mbified
+                </a>
+
+                <div className="mobile-icons">
+                    <a className="nav-link" href="/cart">
+                        <i className="bi bi-cart"></i>
+                        {cartCount > 0 && <span className="badge bg-danger ms-1">{cartCount}</span>}
+                    </a>
+                </div>
+            </div>
+
+            {/* Mobile Menu */}
+            <div className={`mobile-menu ${showMobileMenu ? 'show' : ''}`}>
+                {/* Search Bar */}
+                <form className="mobile-search" onSubmit={handleSearchSubmit}>
+                    <input
+                        type="search"
+                        placeholder="Search..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                    />
+                    <button type="submit">
+                        <i className="bi bi-search"></i>
+                    </button>
+                </form>
+
+                {/* Navigation Links */}
+                <div className="mobile-nav-links">
+                    <a href="/products" onClick={toggleMobileMenu}>All Products</a>
+                    <a href="/category/bundle-deals" onClick={toggleMobileMenu}>Bundle Deals</a>
+                    <a href="/category/weekly-sensation" onClick={toggleMobileMenu}>Weekly Sensation</a>
+                    <a href="/category/top-brands" onClick={toggleMobileMenu}>Top Brands</a>
+                    <a href="/category/directors-pick" onClick={toggleMobileMenu}>Director's Pick</a>
+                    <a href="/category/mobile-phones-communication" onClick={toggleMobileMenu}>Phones & Telecom</a>
+                </div>
+
+                {/* Account Section */}
+                <div className="mobile-account">
+                    {isAuthenticated ? (
+                        <>
+                            <a href="/orders" onClick={toggleMobileMenu}>My Orders</a>
+                            <a href="/wishlist" onClick={toggleMobileMenu}>Wishlist</a>
+                            <a href="/messages" onClick={toggleMobileMenu}>Messages</a>
+                            <button onClick={logout}>Logout</button>
+                        </>
+                    ) : (
+                        <>
+                            <button onClick={() => { openModal("login"); toggleMobileMenu(); }}>
+                                Login
+                            </button>
+                            <button onClick={() => { openModal("register"); toggleMobileMenu(); }}>
+                                Register
+                            </button>
+                        </>
+                    )}
+                </div>
+            </div>
+
+
+
+
+
+
+            <nav className="navbar navbar-expand-lg navbar-dark bg-dark ali-nav">
             <div className="container-fluid flex-column p-0">
 
                 <div className="top-row d-flex align-items-center w-100">
@@ -435,6 +516,7 @@ const Navbar = ({ openModal }) => {
                     </ul>
                 </div>
             </div>
+        </nav>
         </nav>
     );
 };

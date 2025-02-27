@@ -27,7 +27,7 @@ function UploadProductImage() {
         try {
             setUploading(true);
             // Replace the URL below with your Django backend endpoint for product images
-            const response = await fetch('https://z0mbified-store.onrender.com/store/upload/hero-image/', {
+            const response = await fetch('https://z0mbified-store.onrender.com/upload/hero-image/', {
                 method: 'POST',
                 body: formData,
             });

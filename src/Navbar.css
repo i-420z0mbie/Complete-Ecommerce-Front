@@ -269,3 +269,208 @@
     padding: 10px;
     color: #6c757d;
 }
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .ali-nav .container-fluid:not(.mobile-top-row) {
+        display: none !important;
+    }
+
+    .mobile-top-row {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 1rem;
+    }
+
+    .mobile-menu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        background: #2d2d2d;
+    }
+
+    .mobile-menu.show {
+        max-height: 1000px;
+    }
+
+    .mobile-search {
+        padding: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .mobile-search input {
+        flex: 1;
+        padding: 0.5rem;
+        border-radius: 5px;
+        border: none;
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    .mobile-search button {
+        background: none;
+        border: none;
+        color: white;
+        padding: 0 0.5rem;
+    }
+
+    .mobile-nav-links,
+    .mobile-account {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .mobile-nav-links a,
+    .mobile-account a,
+    .mobile-account button {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem;
+        border-radius: 5px;
+        transition: background 0.3s ease;
+    }
+
+    .mobile-nav-links a:hover,
+    .mobile-account a:hover,
+    .mobile-account button:hover {
+        background: rgba(255,107,107,0.2);
+    }
+
+    .mobile-account button {
+        background: none;
+        border: none;
+        text-align: left;
+        width: 100%;
+    }
+
+    .navbar-toggler {
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        padding: 0.25rem;
+    }
+
+    .mobile-icons {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .mobile-icons .nav-link {
+        padding: 0;
+    }
+}
+
+/* Desktop Adjustments */
+@media (min-width: 769px) {
+    .mobile-top-row,
+    .mobile-menu {
+        display: none !important;
+    }
+}
+
+
+@media (min-width: 769px) {
+    .ali-nav .container-fluid {
+        max-width: 100%;
+        padding: 0 15px; /* Match Bootstrap's default container padding */
+    }
+
+    .top-row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+    }
+
+    .bottom-row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        margin: 0;
+        padding: 0.5rem 0;
+    }
+
+    .navbar-brand {
+        margin-right: 2rem; /* Proper spacing for logo */
+        min-width: 180px; /* Prevent logo wrapping */
+    }
+
+    .ali-links {
+        margin-left: auto;
+        flex-grow: 1;
+        justify-content: flex-end;
+        gap: 1.5rem;
+    }
+
+    /* Ensure dropdown menus extend full width */
+    .dropdown-menu {
+        min-width: 200px;
+    }
+
+    /* Fix search container expansion */
+    .search-container {
+        flex: 1;
+        max-width: 600px;
+        margin: 0 2rem;
+    }
+}
+
+
+.navbar > .container-fluid {
+    padding-right: var(--bs-gutter-x, 0.75rem);
+    padding-left: var(--bs-gutter-x, 0.75rem);
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/* Desktop Specific Fixes */
+.desktop-nav .container-fluid {
+    max-width: 100%;
+    padding: 0 15px;
+}
+
+.desktop-nav .top-row {
+    padding: 0.5rem 0;
+}
+
+.desktop-nav .search-container {
+    flex: 1;
+    max-width: 600px;
+    margin: 0 2rem;
+}
+
+.desktop-nav .ali-links {
+    margin-left: auto;
+    flex-grow: 1;
+    justify-content: flex-end;
+    gap: 1.5rem;
+}
+
+/* Ensure full-width background */
+.ali-nav {
+    width: 100%;
+    position: relative;
+}
+
+/* Hide desktop nav on mobile */
+.mobile-top-row,
+.mobile-menu {
+    display: none;
+}
+
+@media (max-width: 992px) {
+    .desktop-nav {
+        display: none !important;
+    }
+
+    .mobile-top-row,
+    .mobile-menu {
+        display: block;
+    }
+}
