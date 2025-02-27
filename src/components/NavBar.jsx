@@ -7,12 +7,15 @@ import { useNavigate } from "react-router-dom";
 const Navbar = ({ openModal }) => {
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState({});
-    const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [subSubcategories, setSubSubcategories] = useState({});
+    const [loadingSubcategories, setLoadingSubcategories] = useState({});
+    const [loadingSubSubcategories, setLoadingSubSubcategories] = useState({});
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [activeCategory, setActiveCategory] = useState(null);
     const [activeSubcategory, setActiveSubcategory] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
+    const [searchLoading, setSearchLoading] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -93,7 +96,8 @@ const Navbar = ({ openModal }) => {
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (searchQuery.trim().length > 1) {
-                fetchSuggestions(searchQuery);
+                setSearchLoading(true);
+                fetchSuggestions(searchQuery).then(() => setSearchLoading(false));
             } else {
                 setSuggestions([]);
             }
@@ -131,7 +135,8 @@ const Navbar = ({ openModal }) => {
 
     // Load subcategories for a category
     const loadSubcategories = async (categoryId) => {
-        if (!subcategories[categoryId]) {
+        if (!subcategories[categoryId] && !loadingSubcategories[categoryId]) {
+            setLoadingSubcategories((prev) => ({ ...prev, [categoryId]: true }));
             try {
                 const response = await api.get(`/store/ajax/load-subcategories/`, {
                     params: { category_id: categoryId },
@@ -142,13 +147,16 @@ const Navbar = ({ openModal }) => {
                 }));
             } catch (error) {
                 console.error("Error loading subcategories:", error);
+            } finally {
+                setLoadingSubcategories((prev) => ({ ...prev, [categoryId]: false }));
             }
         }
     };
 
     // Load sub-subcategories for a subcategory
     const loadSubSubcategories = async (subcategoryId) => {
-        if (!subSubcategories[subcategoryId]) {
+        if (!subSubcategories[subcategoryId] && !loadingSubSubcategories[subcategoryId]) {
+            setLoadingSubSubcategories((prev) => ({ ...prev, [subcategoryId]: true }));
             try {
                 const response = await api.get(`/store/ajax/load-sub-subcategories/`, {
                     params: { subcategory_id: subcategoryId },
@@ -159,6 +167,8 @@ const Navbar = ({ openModal }) => {
                 }));
             } catch (error) {
                 console.error("Error loading sub-subcategories:", error);
+            } finally {
+                setLoadingSubSubcategories((prev) => ({ ...prev, [subcategoryId]: false }));
             }
         }
     };
@@ -179,11 +189,10 @@ const Navbar = ({ openModal }) => {
         return stars;
     }, []);
 
-
     const toAllProduct = async (e) => {
-        e.preventDefault()
-        navigate('/products')
-    }
+        e.preventDefault();
+        navigate("/products");
+    };
 
     // Smooth scrolling function
     const scrollToSection = useCallback(
@@ -240,7 +249,7 @@ const Navbar = ({ openModal }) => {
             </div>
 
             {/* Mobile Menu */}
-            <div className={`mobile-menu ${showMobileMenu ? 'show' : ''}`}>
+            <div className={`mobile-menu ${showMobileMenu ? "show" : ""}`}>
                 {/* Search Bar */}
                 <form className="mobile-search" onSubmit={handleSearchSubmit}>
                     <input
@@ -252,33 +261,66 @@ const Navbar = ({ openModal }) => {
                     <button type="submit">
                         <i className="bi bi-search"></i>
                     </button>
+                    {searchLoading && (
+                        <div className="spinner-border spinner-border-sm text-primary ms-2" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                    )}
                 </form>
 
                 {/* Navigation Links */}
                 <div className="mobile-nav-links">
-                    <a href="/products" onClick={toggleMobileMenu}>All Products</a>
-                    <a href="/category/bundle-deals" onClick={toggleMobileMenu}>Bundle Deals</a>
-                    <a href="/category/weekly-sensation" onClick={toggleMobileMenu}>Weekly Sensation</a>
-                    <a href="/category/top-brands" onClick={toggleMobileMenu}>Top Brands</a>
-                    <a href="/category/directors-pick" onClick={toggleMobileMenu}>Director's Pick</a>
-                    <a href="/category/mobile-phones-communication" onClick={toggleMobileMenu}>Phones & Telecom</a>
+                    <a href="/products" onClick={toggleMobileMenu}>
+                        All Products
+                    </a>
+                    <a href="/category/bundle-deals" onClick={toggleMobileMenu}>
+                        Bundle Deals
+                    </a>
+                    <a href="/category/weekly-sensation" onClick={toggleMobileMenu}>
+                        Weekly Sensation
+                    </a>
+                    <a href="/category/top-brands" onClick={toggleMobileMenu}>
+                        Top Brands
+                    </a>
+                    <a href="/category/directors-pick" onClick={toggleMobileMenu}>
+                        Director's Pick
+                    </a>
+                    <a href="/category/mobile-phones-communication" onClick={toggleMobileMenu}>
+                        Phones & Telecom
+                    </a>
                 </div>
 
                 {/* Account Section */}
                 <div className="mobile-account">
                     {isAuthenticated ? (
                         <>
-                            <a href="/orders" onClick={toggleMobileMenu}>My Orders</a>
-                            <a href="/wishlist" onClick={toggleMobileMenu}>Wishlist</a>
-                            <a href="/messages" onClick={toggleMobileMenu}>Messages</a>
+                            <a href="/orders" onClick={toggleMobileMenu}>
+                                My Orders
+                            </a>
+                            <a href="/wishlist" onClick={toggleMobileMenu}>
+                                Wishlist
+                            </a>
+                            <a href="/messages" onClick={toggleMobileMenu}>
+                                Messages
+                            </a>
                             <button onClick={logout}>Logout</button>
                         </>
                     ) : (
                         <>
-                            <button onClick={() => { openModal("login"); toggleMobileMenu(); }}>
+                            <button
+                                onClick={() => {
+                                    openModal("login");
+                                    toggleMobileMenu();
+                                }}
+                            >
                                 Login
                             </button>
-                            <button onClick={() => { openModal("register"); toggleMobileMenu(); }}>
+                            <button
+                                onClick={() => {
+                                    openModal("register");
+                                    toggleMobileMenu();
+                                }}
+                            >
                                 Register
                             </button>
                         </>
@@ -286,237 +328,258 @@ const Navbar = ({ openModal }) => {
                 </div>
             </div>
 
-
-
-
-
-
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark ali-nav">
-            <div className="container-fluid flex-column p-0">
-
-                <div className="top-row d-flex align-items-center w-100">
-                    <a className="navbar-brand ms-3" href="/">
-                        z0mbified: The store
-                    </a>
-                    <form
-                        className="search-container mx-auto position-relative"
-                        onSubmit={handleSearchSubmit}
-                        autoComplete="off"
-                    >
-                        <input
-                            className="form-control search-input"
-                            type="search"
-                            placeholder="Search"
-                            aria-label="Search"
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                        />
-                        <button className="btn search-button" type="submit">
-                            <i className="bi bi-search"></i>
-                        </button>
-                        {suggestions.length > 0 && (
-                            <ul
-                                ref={suggestionBoxRef}
-                                className="suggestions-list list-group position-absolute"
-                                style={{
-                                    top: "100%",
-                                    left: 0,
-                                    right: 0,
-                                    zIndex: 1000,
-                                }}
-                            >
-                                {suggestions.slice(0, 5).map((suggestion) => (
-                                    <li
-                                        key={suggestion.id}
-                                        className="list-group-item list-group-item-action"
-                                        onClick={() => handleSuggestionClick(suggestion)}
-                                        style={{ cursor: "pointer" }}
-                                    >
-                                        {suggestion.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </form>
-                    <ul className="navbar-nav me-3 d-flex flex-row align-items-center">
-                        <li className="nav-item dropdown me-3">
-                            <a
-                                className="nav-link dropdown-toggle"
-                                href="#"
-                                id="profileDropdown"
-                                role="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                <i className="bi bi-person" style={{ fontSize: "1.2rem" }}></i> Profile
-                            </a>
-                            <ul className="dropdown-menu" aria-labelledby="profileDropdown">
-                                {isAuthenticated ? (
-                                    <>
-                                        <li>
-                                            <a className="dropdown-item" href="/orders">
-                                                <i className="bi bi-receipt me-2"></i> My Orders
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a className="dropdown-item" href="/wishlist">
-                                                <i className="bi bi-heart me-2"></i> WishList
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a className="dropdown-item" href="/messages">
-                                                <i className="bi bi-chat-dots me-2"></i> Messages
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <button className="dropdown-item" onClick={logout}>
-                                                <i className="bi bi-box-arrow-right me-2"></i> Logout
-                                            </button>
-                                        </li>
-                                    </>
-                                ) : (
-                                    <>
-                                        <li>
-                                            <button className="dropdown-item" onClick={() => openModal("login")}>
-                                                Login
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button className="dropdown-item" onClick={() => openModal("register")}>
-                                                Register
-                                            </button>
-                                        </li>
-                                    </>
-                                )}
-                            </ul>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="/cart">
-                                <i className="bi bi-cart" style={{ fontSize: "1.2rem" }}></i>
-                                {cartCount > 0 && <span className="badge bg-danger ms-1">{cartCount}</span>}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                {/* Bottom Row: All Categories + Additional Links */}
-                <div className="bottom-row d-flex align-items-center w-100 mt-2">
-                    <div className="all-categories-container ms-3">
-                        <div className="dropdown">
-                            <a
-                                className="dropdown-toggle all-categories-link"
-                                href="#"
-                                id="allCategoriesDropdown"
-                                role="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                All Categories
-                            </a>
-                            <ul className="dropdown-menu" aria-labelledby="allCategoriesDropdown">
-                                {categories.map((cat) => (
-                                    <li
-                                        key={cat.id}
-                                        className="dropdown-submenu-wrapper"
-                                        onMouseEnter={() => {
-                                            handleMouseEnter(setActiveCategory, cat.id);
-                                            loadSubcategories(cat.id);
-                                        }}
-                                        onMouseLeave={() => handleMouseLeave(setActiveCategory)}
-                                    >
-                                        <a
-                                            className="dropdown-item dropdown-toggle"
-                                            href={`/category/${cat.slug}`}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                navigate(`/category/${cat.slug}`);
-                                            }}
+                <div className="container-fluid flex-column p-0">
+                    <div className="top-row d-flex align-items-center w-100">
+                        <a className="navbar-brand ms-3" href="/">
+                            z0mbified: The store
+                        </a>
+                        <form
+                            className="search-container mx-auto position-relative"
+                            onSubmit={handleSearchSubmit}
+                            autoComplete="off"
+                        >
+                            <input
+                                className="form-control search-input"
+                                type="search"
+                                placeholder="Search"
+                                aria-label="Search"
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                            />
+                            <button className="btn search-button" type="submit">
+                                <i className="bi bi-search"></i>
+                            </button>
+                            {searchLoading && (
+                                <div
+                                    className="spinner-border spinner-border-sm text-primary position-absolute"
+                                    style={{ top: "50%", right: "10px" }}
+                                    role="status"
+                                >
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                            )}
+                            {suggestions.length > 0 && (
+                                <ul
+                                    ref={suggestionBoxRef}
+                                    className="suggestions-list list-group position-absolute"
+                                    style={{
+                                        top: "100%",
+                                        left: 0,
+                                        right: 0,
+                                        zIndex: 1000,
+                                    }}
+                                >
+                                    {suggestions.slice(0, 5).map((suggestion) => (
+                                        <li
+                                            key={suggestion.id}
+                                            className="list-group-item list-group-item-action"
+                                            onClick={() => handleSuggestionClick(suggestion)}
+                                            style={{ cursor: "pointer" }}
                                         >
-                                            {cat.name}
-                                        </a>
-                                        {activeCategory === cat.id && subcategories[cat.id] && (
-                                            <ul className="dropdown-menu submenu-right">
-                                                {subcategories[cat.id].map((sub) => (
-                                                    <li
-                                                        key={sub.id}
-                                                        className="dropdown-submenu-wrapper"
-                                                        onMouseEnter={() => {
-                                                            handleMouseEnter(setActiveSubcategory, sub.id, 100);
-                                                            loadSubSubcategories(sub.id);
-                                                        }}
-                                                        onMouseLeave={() => handleMouseLeave(setActiveSubcategory)}
-                                                    >
-                                                        <a
-                                                            className="dropdown-item dropdown-toggle"
-                                                            href={`/category/${cat.slug}/${sub.slug}`}
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                navigate(`/category/${cat.slug}/${sub.slug}`);
-                                                            }}
-                                                        >
-                                                            {sub.name}
-                                                        </a>
-                                                        {activeSubcategory === sub.id && subSubcategories[sub.id] && (
-                                                            <ul className="dropdown-menu submenu-right">
-                                                                {subSubcategories[sub.id].map((subSub) => (
-                                                                    <li key={subSub.id}>
-                                                                        <a
-                                                                            className="dropdown-item"
-                                                                            href={`/category/${cat.slug}/${sub.slug}/${subSub.slug}`}
-                                                                            onClick={(e) => {
-                                                                                e.preventDefault();
-                                                                                navigate(`/category/${cat.slug}/${sub.slug}/${subSub.slug}`);
-                                                                            }}
-                                                                        >
-                                                                            {subSub.name}
-                                                                        </a>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        )}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                                            {suggestion.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </form>
+                        <ul className="navbar-nav me-3 d-flex flex-row align-items-center">
+                            <li className="nav-item dropdown me-3">
+                                <a
+                                    className="nav-link dropdown-toggle"
+                                    href="#"
+                                    id="profileDropdown"
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    <i className="bi bi-person" style={{ fontSize: "1.2rem" }}></i> Profile
+                                </a>
+                                <ul className="dropdown-menu" aria-labelledby="profileDropdown">
+                                    {isAuthenticated ? (
+                                        <>
+                                            <li>
+                                                <a className="dropdown-item" href="/orders">
+                                                    <i className="bi bi-receipt me-2"></i> My Orders
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a className="dropdown-item" href="/wishlist">
+                                                    <i className="bi bi-heart me-2"></i> WishList
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a className="dropdown-item" href="/messages">
+                                                    <i className="bi bi-chat-dots me-2"></i> Messages
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <button className="dropdown-item" onClick={logout}>
+                                                    <i className="bi bi-box-arrow-right me-2"></i> Logout
+                                                </button>
+                                            </li>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <li>
+                                                <button className="dropdown-item" onClick={() => openModal("login")}>
+                                                    Login
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button className="dropdown-item" onClick={() => openModal("register")}>
+                                                    Register
+                                                </button>
+                                            </li>
+                                        </>
+                                    )}
+                                </ul>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link" href="/cart">
+                                    <i className="bi bi-cart" style={{ fontSize: "1.2rem" }}></i>
+                                    {cartCount > 0 && <span className="badge bg-danger ms-1">{cartCount}</span>}
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <ul className="nav ms-4 flex-row gap-3 ali-links">
-                        <li className="nav-item">
-                            <a className="nav-link text-white" href="/products">
-                                All Products
-                            </a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link text-white" href="/category/bundle-deals">
-                                Bundle deals
-                            </a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link text-white" href="/category/weekly-sensation">
-                                Weekly sensation
-                            </a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link text-white" href="/category/top-brands">
-                                Top Brands
-                            </a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link text-white" href="/category/directors-pick">
-                                Director's Pick
-                            </a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link text-white" href="/category/mobile-phones-communication">
-                                Phones & Telecom
-                            </a>
-                        </li>
-                    </ul>
+                    {/* Bottom Row: All Categories + Additional Links */}
+                    <div className="bottom-row d-flex align-items-center w-100 mt-2">
+                        <div className="all-categories-container ms-3">
+                            <div className="dropdown">
+                                <a
+                                    className="dropdown-toggle all-categories-link"
+                                    href="#"
+                                    id="allCategoriesDropdown"
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    All Categories
+                                </a>
+                                <ul className="dropdown-menu" aria-labelledby="allCategoriesDropdown">
+                                    {categories.map((cat) => (
+                                        <li
+                                            key={cat.id}
+                                            className="dropdown-submenu-wrapper"
+                                            onMouseEnter={() => {
+                                                handleMouseEnter(setActiveCategory, cat.id);
+                                                loadSubcategories(cat.id);
+                                            }}
+                                            onMouseLeave={() => handleMouseLeave(setActiveCategory)}
+                                        >
+                                            <a
+                                                className="dropdown-item dropdown-toggle"
+                                                href={`/category/${cat.slug}`}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    navigate(`/category/${cat.slug}`);
+                                                }}
+                                            >
+                                                {cat.name}
+                                            </a>
+                                            {activeCategory === cat.id && (
+                                                <ul className="dropdown-menu submenu-right">
+                                                    {loadingSubcategories[cat.id] ? (
+                                                        <li className="dropdown-item text-center">
+                                                            <div className="spinner-border spinner-border-sm text-primary" role="status">
+                                                                <span className="visually-hidden">Loading...</span>
+                                                            </div>
+                                                        </li>
+                                                    ) : (
+                                                        subcategories[cat.id] &&
+                                                        subcategories[cat.id].map((sub) => (
+                                                            <li
+                                                                key={sub.id}
+                                                                className="dropdown-submenu-wrapper"
+                                                                onMouseEnter={() => {
+                                                                    handleMouseEnter(setActiveSubcategory, sub.id, 100);
+                                                                    loadSubSubcategories(sub.id);
+                                                                }}
+                                                                onMouseLeave={() => handleMouseLeave(setActiveSubcategory)}
+                                                            >
+                                                                <a
+                                                                    className="dropdown-item dropdown-toggle"
+                                                                    href={`/category/${cat.slug}/${sub.slug}`}
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        navigate(`/category/${cat.slug}/${sub.slug}`);
+                                                                    }}
+                                                                >
+                                                                    {sub.name}
+                                                                </a>
+                                                                {activeSubcategory === sub.id && (
+                                                                    <ul className="dropdown-menu submenu-right">
+                                                                        {loadingSubSubcategories[sub.id] ? (
+                                                                            <li className="dropdown-item text-center">
+                                                                                <div className="spinner-border spinner-border-sm text-primary" role="status">
+                                                                                    <span className="visually-hidden">Loading...</span>
+                                                                                </div>
+                                                                            </li>
+                                                                        ) : (
+                                                                            subSubcategories[sub.id] &&
+                                                                            subSubcategories[sub.id].map((subSub) => (
+                                                                                <li key={subSub.id}>
+                                                                                    <a
+                                                                                        className="dropdown-item"
+                                                                                        href={`/category/${cat.slug}/${sub.slug}/${subSub.slug}`}
+                                                                                        onClick={(e) => {
+                                                                                            e.preventDefault();
+                                                                                            navigate(`/category/${cat.slug}/${sub.slug}/${subSub.slug}`);
+                                                                                        }}
+                                                                                    >
+                                                                                        {subSub.name}
+                                                                                    </a>
+                                                                                </li>
+                                                                            ))
+                                                                        )}
+                                                                    </ul>
+                                                                )}
+                                                            </li>
+                                                        ))
+                                                    )}
+                                                </ul>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                        <ul className="nav ms-4 flex-row gap-3 ali-links">
+                            <li className="nav-item">
+                                <a className="nav-link text-white" href="/products">
+                                    All Products
+                                </a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link text-white" href="/category/bundle-deals">
+                                    Bundle deals
+                                </a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link text-white" href="/category/weekly-sensation">
+                                    Weekly sensation
+                                </a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link text-white" href="/category/top-brands">
+                                    Top Brands
+                                </a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link text-white" href="/category/directors-pick">
+                                    Director's Pick
+                                </a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link text-white" href="/category/mobile-phones-communication">
+                                    Phones & Telecom
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
         </nav>
     );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../api.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Heart, HeartFill } from "react-bootstrap-icons";
@@ -140,12 +140,8 @@ export default function ProductsList() {
                                 <img
                                     src={product.images[0].image}
                                     alt={product.name}
-                                    className="card-img-top"
-                                    style={{
-                                        objectFit: "fill",
-                                        height: "400px",
-                                        width: "100%",
-                                    }}
+                                    className="img-fluid object-fit-md-contain"
+                                    loading="lazy"
                                 />
                             ) : (
                                 <div className="card-img-top bg-secondary" style={{ height: "200px" }}></div>

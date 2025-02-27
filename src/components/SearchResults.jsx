@@ -5,17 +5,21 @@ import api from "../api";
 
 const SearchResults = () => {
     const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
     const location = useLocation();
     const query = new URLSearchParams(location.search).get("query");
 
     useEffect(() => {
         const fetchSearchResults = async () => {
             if (query) {
+                setLoading(true);
                 try {
                     const response = await api.get(`/store/products/?search=${query}`);
                     setProducts(response.data);
                 } catch (error) {
                     console.error("Error fetching search results:", error);
+                } finally {
+                    setLoading(false);
                 }
             }
         };
@@ -26,7 +30,13 @@ const SearchResults = () => {
     return (
         <div className="container mt-4">
             <h2>Search Results for "{query}"</h2>
-            {products.length > 0 ? (
+            {loading ? (
+                <div className="text-center my-5">
+                    <div className="spinner-border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            ) : products.length > 0 ? (
                 <div className="row">
                     {products.map((product) => (
                         <div key={product.id} className="col-md-4 mb-3">
