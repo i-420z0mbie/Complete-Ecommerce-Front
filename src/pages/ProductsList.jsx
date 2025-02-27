@@ -8,6 +8,7 @@ export default function ProductsList() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [wishlist, setWishlist] = useState([]);
+    const [wishlistLoading, setWishlistLoading] = useState([]);
     const location = useLocation();
     const nav = useNavigate();
 
@@ -45,6 +46,9 @@ export default function ProductsList() {
     // Note: We pass { skipAuthRefresh: true } to bypass the token refresh interceptor.
     const toggleWishlist = async (productId, e) => {
         e.stopPropagation();
+        // Add productId to wishlistLoading to show loading animation
+        setWishlistLoading(prev => [...prev, productId]);
+
         const existingItem = wishlist.find(item => item.product === productId);
 
         try {
@@ -68,6 +72,9 @@ export default function ProductsList() {
             } else {
                 alert("An error occurred while updating your wishlist. (Error Status: " + status + ")");
             }
+        } finally {
+            // Remove productId from wishlistLoading after the request completes
+            setWishlistLoading(prev => prev.filter(id => id !== productId));
         }
     };
 
@@ -117,10 +124,16 @@ export default function ProductsList() {
                                     cursor: "pointer",
                                 }}
                             >
-                                {isInWishlist(product.id) ? (
-                                    <HeartFill className="text-danger" size={24} />
+                                {wishlistLoading.includes(product.id) ? (
+                                    <div className="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
                                 ) : (
-                                    <Heart className="text-muted" size={24} />
+                                    isInWishlist(product.id) ? (
+                                        <HeartFill className="text-danger" size={24} />
+                                    ) : (
+                                        <Heart className="text-muted" size={24} />
+                                    )
                                 )}
                             </div>
                             {product.images && product.images.length > 0 ? (
@@ -129,8 +142,8 @@ export default function ProductsList() {
                                     alt={product.name}
                                     className="card-img-top"
                                     style={{
-                                        objectFit: "cover",
-                                        height: "200px",
+                                        objectFit: "fill",
+                                        height: "400px",
                                         width: "100%",
                                     }}
                                 />

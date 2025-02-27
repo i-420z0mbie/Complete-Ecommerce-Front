@@ -12,6 +12,7 @@ export default function CartPage() {
     const [showCheckoutForm, setShowCheckoutForm] = useState(false);
     const [shippingAddress, setShippingAddress] = useState("");
     const [contactNumber, setContactNumber] = useState("");
+    const [isCheckoutSubmitting, setIsCheckoutSubmitting] = useState(false);
 
     const navigate = useNavigate();
 
@@ -43,7 +44,7 @@ export default function CartPage() {
     const handleRemoveItem = async (itemId) => {
         try {
             await api.delete(`/store/cart-items/${itemId}/`);
-            setCartItems(items => items.filter(item => item.id !== itemId));
+            setCartItems((items) => items.filter((item) => item.id !== itemId));
         } catch (err) {
             setError("Failed to remove item. Please try again.");
         }
@@ -64,16 +65,19 @@ export default function CartPage() {
             return;
         }
 
+        setIsCheckoutSubmitting(true);
         try {
             const response = await api.post("/store/orders/", {
                 shipping_address: shippingAddress,
-                contact_info: contactNumber, // use contactNumber state variable
+                contact_info: contactNumber,
             });
             console.log("Order created:", response.data);
             navigate(`/order/${response.data.id}`);
         } catch (err) {
             console.error("Error placing order:", err);
             setError("Failed to place order. Please try again.");
+        } finally {
+            setIsCheckoutSubmitting(false);
         }
     };
 
@@ -236,13 +240,21 @@ export default function CartPage() {
                                                                 type="text"
                                                                 id="contactNumber"
                                                                 className="form-control"
-                                                                value={contactNumber} // changed from contactinfo to contactNumber
+                                                                value={contactNumber}
                                                                 onChange={(e) => setContactNumber(e.target.value)}
                                                                 required
                                                             />
                                                         </div>
-                                                        <button type="submit" className="btn btn-light btn-lg w-100 py-3">
-                                                            Confirm Order
+                                                        <button
+                                                            type="submit"
+                                                            className="btn btn-light btn-lg w-100 py-3"
+                                                            disabled={isCheckoutSubmitting}
+                                                        >
+                                                            {isCheckoutSubmitting ? (
+                                                                <span className="spinner-border spinner-border-sm text-dark" role="status" aria-hidden="true"></span>
+                                                            ) : (
+                                                                "Confirm Order"
+                                                            )}
                                                         </button>
                                                     </form>
                                                 ) : (

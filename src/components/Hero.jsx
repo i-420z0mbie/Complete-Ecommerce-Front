@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../Hero.css"; // Ensure this file exists with any extra styling you want
+import "../Hero.css";
 
 const Hero = () => {
     const [heroImages, setHeroImages] = useState([]);
     const navigate = useNavigate();
 
-    // For demonstration, using static data.
-    // Replace this with an API call when ready.
     useEffect(() => {
         const staticHeroImages = [
             {
@@ -38,27 +36,9 @@ const Hero = () => {
                 image: "/hero_images/jewellry.jpg",
                 link: "/deals",
             },
-            {
-                id: 5,
-                title: "Computers & Accessories",
-                description: "Everything you need in one place",
-                image: "/hero_images/accessories.jpg",
-                link: "/category/graphics-cards",
-            },
         ];
         setHeroImages(staticHeroImages);
     }, []);
-
-    // Initialize the carousel when images are loaded
-    useEffect(() => {
-        const carouselElement = document.getElementById("heroCarousel");
-        if (carouselElement && window.bootstrap) {
-            new window.bootstrap.Carousel(carouselElement, {
-                interval: 2000,
-                ride: "carousel",
-            });
-        }
-    }, [heroImages]);
 
     if (heroImages.length === 0) return null;
 
@@ -67,7 +47,7 @@ const Hero = () => {
             id="heroCarousel"
             className="carousel slide carousel-fade"
             data-bs-ride="carousel"
-            data-bs-interval="5000"
+            data-bs-interval="5000" // Consistent interval for all devices
         >
             <div className="carousel-inner">
                 {heroImages.map((hero, index) => (
@@ -80,8 +60,8 @@ const Hero = () => {
                             className="d-block w-100 hero-image"
                             alt={hero.title || "Hero"}
                             style={{
-                                height: "500px", // Adjust height as needed
-                                objectFit: "cover", // Use "cover" to fill the container
+                                height: "500px",
+                                objectFit: "cover",
                                 objectPosition: "center",
                             }}
                         />

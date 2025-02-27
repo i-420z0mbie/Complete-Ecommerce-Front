@@ -23,6 +23,12 @@ const ProductsDetail = () => {
     // State for showing seller contact details
     const [showContactDetails, setShowContactDetails] = useState(false);
 
+    // Loading states for buttons
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const [isBuyingNow, setIsBuyingNow] = useState(false);
+    const [isContactingSeller, setIsContactingSeller] = useState(false);
+    const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
+
     // Refs for sections (smooth scrolling, etc.)
     const sectionRefs = {
         description: useRef(null),
@@ -53,6 +59,7 @@ const ProductsDetail = () => {
             console.warn("No product available or out of stock");
             return;
         }
+        setIsAddingToCart(true);
         try {
             console.log("Adding product to cart:", { productId: product.id, quantity });
             // Pass the custom flag to bypass token refresh for this call
@@ -65,6 +72,8 @@ const ProductsDetail = () => {
             } else {
                 toast.error("Failed to add product to cart. Please try again.");
             }
+        } finally {
+            setIsAddingToCart(false);
         }
     }, [product, quantity, addToCart]);
 
@@ -74,6 +83,7 @@ const ProductsDetail = () => {
             return;
         }
 
+        setIsConfirmingOrder(true);
         let activeCartId = cartId;
         if (!activeCartId) {
             try {
@@ -85,10 +95,12 @@ const ProductsDetail = () => {
                     activeCartId = res.data.id;
                 } else {
                     toast.error("No active cart found");
+                    setIsConfirmingOrder(false);
                     return;
                 }
             } catch (err) {
                 toast.error("No active cart found");
+                setIsConfirmingOrder(false);
                 return;
             }
         }
@@ -105,6 +117,8 @@ const ProductsDetail = () => {
         } catch (err) {
             console.error("Error placing order:", err.response || err.message);
             toast.error("Failed to place order");
+        } finally {
+            setIsConfirmingOrder(false);
         }
     }, [cartId, shippingAddress, contactInfo, navigate]);
 
@@ -113,6 +127,7 @@ const ProductsDetail = () => {
             toast.error("Product is out of stock");
             return;
         }
+        setIsBuyingNow(true);
         try {
             // Pass the custom flag to bypass token refresh for this call as well
             await addToCart(product.id, quantity, { skipAuthRefresh: true });
@@ -128,6 +143,8 @@ const ProductsDetail = () => {
             } else {
                 toast.error("Failed to add to cart. Please try again.");
             }
+        } finally {
+            setIsBuyingNow(false);
         }
     }, [product, quantity, addToCart, showCheckoutForm, shippingAddress, contactInfo, handleConfirmOrder]);
 
@@ -156,9 +173,13 @@ const ProductsDetail = () => {
         [sectionRefs]
     );
 
-    // Toggle contact details visibility
+    // Toggle contact details visibility with a loading simulation
     const handleContactSeller = () => {
-        setShowContactDetails((prev) => !prev);
+        setIsContactingSeller(true);
+        setTimeout(() => {
+            setShowContactDetails((prev) => !prev);
+            setIsContactingSeller(false);
+        }, 500);
     };
 
     if (loading) {
@@ -252,19 +273,28 @@ const ProductsDetail = () => {
                             </button>
                         </div>
                         <button
-                            className="btn btn-primary flex-grow-1"
+                            className="btn btn-primary flex-grow-1 btn-animate"
                             onClick={handleAddToCart}
-                            disabled={product.inventory < 1}
+                            disabled={product.inventory < 1 || isAddingToCart}
                         >
-                            <i className="bi bi-cart-plus me-2"></i>
-                            Add to Cart
+                            {isAddingToCart ? (
+                                <span className="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></span>
+                            ) : (
+                                <>
+                                    <i className="bi bi-cart-plus me-2"></i>Add to Cart
+                                </>
+                            )}
                         </button>
                         <button
-                            className="btn btn-success flex-grow-1"
+                            className="btn btn-success flex-grow-1 btn-animate"
                             onClick={handleBuyNow}
-                            disabled={product.inventory < 1}
+                            disabled={product.inventory < 1 || isBuyingNow}
                         >
-                            Buy Now
+                            {isBuyingNow ? (
+                                <span className="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></span>
+                            ) : (
+                                "Buy Now"
+                            )}
                         </button>
                     </div>
                     <div className="alert alert-info">
@@ -302,8 +332,16 @@ const ProductsDetail = () => {
                                     placeholder="Enter your contact number"
                                 />
                             </div>
-                            <button className="btn btn-success" onClick={handleConfirmOrder}>
-                                Confirm Order
+                            <button
+                                className="btn btn-success"
+                                onClick={handleConfirmOrder}
+                                disabled={isConfirmingOrder}
+                            >
+                                {isConfirmingOrder ? (
+                                    <span className="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></span>
+                                ) : (
+                                    "Confirm Order"
+                                )}
                             </button>
                         </div>
                     )}
@@ -425,9 +463,19 @@ const ProductsDetail = () => {
                                         )}
                                         {/* Action Buttons */}
                                         <div className="d-flex gap-3">
-                                            <button className="btn btn-outline-secondary" onClick={handleContactSeller}>
-                                                <i className="bi bi-chat-dots me-2"></i>
-                                                Contact Seller
+                                            <button
+                                                className="btn btn-outline-secondary"
+                                                onClick={handleContactSeller}
+                                                disabled={isContactingSeller}
+                                            >
+                                                {isContactingSeller ? (
+                                                    <span className="spinner-border spinner-border-sm text-secondary" role="status" aria-hidden="true"></span>
+                                                ) : (
+                                                    <>
+                                                        <i className="bi bi-chat-dots me-2"></i>
+                                                        Contact Seller
+                                                    </>
+                                                )}
                                             </button>
                                         </div>
                                         {/* Conditionally Render Contact Details */}

@@ -6,6 +6,7 @@ export default function Wishlist() {
     const [wishlistProducts, setWishlistProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [removing, setRemoving] = useState([]);
     const navigate = useNavigate();
 
     // Fetch wishlist entries and then load full product details for each entry.
@@ -40,6 +41,8 @@ export default function Wishlist() {
 
     // Remove a wishlist entry using its wishlist_id.
     const removeFromWishlist = async (wishlistId) => {
+        // Add wishlistId to removing state to show loading animation
+        setRemoving(prev => [...prev, wishlistId]);
         try {
             await api.delete(`/store/wishlists/${wishlistId}/`);
             setWishlistProducts((prev) =>
@@ -47,6 +50,9 @@ export default function Wishlist() {
             );
         } catch (err) {
             console.error("Error removing product from wishlist", err);
+        } finally {
+            // Remove wishlistId from removing state after request completes
+            setRemoving(prev => prev.filter(id => id !== wishlistId));
         }
     };
 
@@ -87,8 +93,15 @@ export default function Wishlist() {
                                         e.stopPropagation(); // Prevent navigating to product details.
                                         removeFromWishlist(item.wishlist_id);
                                     }}
+                                    disabled={removing.includes(item.wishlist_id)}
                                 >
-                                    Remove
+                                    {removing.includes(item.wishlist_id) ? (
+                                        <div className="spinner-border spinner-border-sm text-light" role="status">
+                                            <span className="visually-hidden">Removing...</span>
+                                        </div>
+                                    ) : (
+                                        "Remove"
+                                    )}
                                 </button>
                                 {item.product.images && item.product.images.length > 0 ? (
                                     <img
