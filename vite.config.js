@@ -9,10 +9,13 @@ export default defineConfig({
     proxy: {
       // Proxy requests starting with /api to your Django backend
       '/api': {
-        target: 'https://z0mbified-store.onrender.com', // Replace with your Django backend URL
+        target: 'https://zombified-store.onrender.com', // Your Django backend URL
         changeOrigin: true,
         secure: false, // Set to true if your backend has a valid SSL certificate
       },
     },
+  },
+  preview: {
+    allowedHosts: ['zombified-store.onrender.com'], // Allow the Django backend host
   },
 })
