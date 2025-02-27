@@ -139,9 +139,9 @@ const ProductsDetail = () => {
         } catch (err) {
             console.error("Error in Buy Now:", err.response || err.message);
             if (err.response && err.response.status === 401) {
-                alert("You need to log in to add products to your cart.");
+                alert("You need to log in to perform task.");
             } else {
-                toast.error("Failed to add to cart. Please try again.");
+                toast.error("Failed. Try again later");
             }
         } finally {
             setIsBuyingNow(false);
