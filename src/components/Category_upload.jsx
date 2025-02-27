@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-function UploadProductImage() {
+function UploadCategoryImage() {
     const [file, setFile] = useState(null);
-    const [productId, setProductId] = useState('');
+    const [cateogoryId, setCategoryId] = useState('');
     const [uploading, setUploading] = useState(false);
     const [result, setResult] = useState(null);
 
@@ -11,23 +11,23 @@ function UploadProductImage() {
     };
 
     const handleProductIdChange = (e) => {
-        setProductId(e.target.value);
+        setCategoryId(e.target.value);
     };
 
     const handleUpload = async () => {
-        if (!file || !productId) {
+        if (!file || !cateogoryId) {
             alert('Please provide a product ID and select an image file.');
             return;
         }
 
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('product_id', productId);
+        formData.append('category_id', cateogoryId);
 
         try {
             setUploading(true);
             // Replace the URL below with your Django backend endpoint for product images
-            const response = await fetch('https://your-django-backend-domain/upload/product-image/', {
+            const response = await fetch('https://z0mbified-store.onrender.com/store/upload/category-image/', {
                 method: 'POST',
                 body: formData,
             });
@@ -45,8 +45,8 @@ function UploadProductImage() {
             <h3>Upload Product Image</h3>
             <input
                 type="text"
-                placeholder="Enter Product ID"
-                value={productId}
+                placeholder="Enter Category ID"
+                value={cateogoryId}
                 onChange={handleProductIdChange}
             />
             <br />
@@ -64,4 +64,4 @@ function UploadProductImage() {
     );
 }
 
-export default UploadProductImage;
+export default UploadCategoryImage;

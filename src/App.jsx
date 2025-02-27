@@ -7,7 +7,8 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Navbar from "./components/NavBar.jsx";
 import Footer from "./components/Footer.jsx";
 import Login from "./pages/Login.jsx";
-import UploadProductImage from "./components/Upload.jsx";
+import UploadProductImage from "./components/ProductUpload.jsx";
+import UploadCategoryImage from "./components/Category_upload.jsx";
 import OrderDetail from "./components/OrderDetail.jsx";
 import Cart from "./pages/Cart.jsx";
 import Wishlist from "./components/WishList.jsx";
@@ -25,6 +26,7 @@ import ProductsDetail from "./components/ProductsDetail.jsx";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
+import UploadStoreImage from "./components/Store_logo.jsx";
 
 function AppContent() {
     const [modalType, setModalType] = useState(null);
@@ -52,7 +54,11 @@ function AppContent() {
                 {/* Public Routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/search" element={<SearchResults />} />
-                <Route path="/upload" element={<UploadProductImage />} />
+                <Route path="/product_upload" element={<UploadProductImage />} />
+                <Route path="/category_upload" element={<UploadCategoryImage />} />
+                <Route path="/store_upload" element={<UploadStoreImage />} />
+
+
                 <Route
                     path="/category/:categorySlug/:subCategorySlug?/:subSubCategorySlug?"
                     element={<CategoryProducts />}
