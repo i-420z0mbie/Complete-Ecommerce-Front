@@ -1,0 +1,77 @@
+/* Ensure dropdown submenus appear on hover */
+.dropdown-submenu:hover > .dropdown-menu {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    margin-top: -0.125rem;
+    border-radius: 0.25rem;
+    min-width: 200px;
+}
+.italic-text {
+    font-style: italic;
+    /* Optionally add additional styling: */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #343a40;
+}
+
+
+/* Fix hidden dropdown menus */
+.dropdown-menu {
+    display: none;
+}
+
+/* Ensure parent category dropdown stays open */
+.nav-item.dropdown:hover > .dropdown-menu {
+    display: block;
+}
+
+/* Optional: Style for better visibility */
+.dropdown-menu .dropdown-item {
+    white-space: nowrap;
+    padding: 8px 15px;
+}
+
+/* Navbar styling */
+.navbar {
+    padding: 15px;
+}
+
+/*.navbar .form-control {*/
+/*    border-radius: 50px;*/
+/*    padding: 10px 15px;*/
+/*    width: 300px;*/
+/*}*/
+
+/* Responsive search bar */
+@media (max-width: 768px) {
+    .navbar .form-control {
+        width: 100%;
+    }
+}
+
+
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+
+.placeholder {
+    background: #f6f7f8;
+    background-image: linear-gradient(
+            to right,
+            #f6f7f8 0%,
+            #edeef1 20%,
+            #f6f7f8 40%,
+            #f6f7f8 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 1.5s infinite linear;
+    border-radius: 4px;
+}
+
+/* Optional: Override Bootstrap's default placeholder animation */
+.placeholder-glow .placeholder {
+    animation: shimmer 1.5s infinite linear;
+}

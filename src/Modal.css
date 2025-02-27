@@ -1,0 +1,45 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+    z-index: 1000;
+}
+
+.modal-content {
+    /* Constrain the modal width so it doesn't stretch out */
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+    background: transparent;
+    padding: 0;
+    border: none;
+    position: relative;
+    animation: slideIn 0.3s ease;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

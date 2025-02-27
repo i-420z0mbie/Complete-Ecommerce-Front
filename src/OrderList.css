@@ -1,0 +1,148 @@
+/* OrderList.css */
+
+/* Container for orders with reduced gap and padding */
+.orders-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;         /* Reduced gap between order cards */
+    padding: 10px;     /* Less container padding */
+}
+
+/* Order card styling with reduced padding, smaller fonts, and simpler shadows */
+.order-card {
+    padding: 10px;             /* Reduced padding inside cards */
+    border: 1px solid #ddd;    /* Simple border */
+    border-radius: 4px;        /* Smaller border radius */
+    font-size: 14px;           /* Smaller font size for card content */
+    background-color: #fff;    /* White background */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* Subtle shadow */
+    transition: transform 0.3s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Slide-in animation for order cards */
+.slide-in {
+    animation: slideIn 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Order number styling */
+.order-number {
+    font-size: 16px;   /* Slightly smaller order number font */
+    margin: 0;
+}
+
+/* Status badge styling with reduced font and padding */
+.status-badge {
+    font-size: 12px;   /* Reduced badge font size */
+    padding: 4px 6px;  /* Smaller badge padding */
+    border-radius: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-badge.completed {
+    background: #4CAF50;
+    color: white;
+}
+
+.status-badge.processing {
+    background: #FFC107;
+    color: black;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,193,7,0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255,193,7,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,193,7,0); }
+}
+
+/* Item card styling */
+.item-card {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.item-card:hover {
+    background: #e9ecef;
+    transform: translateX(10px);
+}
+
+/* Delete button styles with reduced size */
+.delete-button {
+    background: linear-gradient(45deg, #ff4444, #ff6666);
+    color: white;
+    border: none;
+    padding: 4px 8px;   /* Reduced padding */
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 12px;    /* Smaller font size */
+    font-weight: 500;
+    box-shadow: 0 3px 6px rgba(255,68,68,0.2);
+}
+
+.delete-button:hover {
+    background: linear-gradient(45deg, #ff3333, #ff5555);
+    box-shadow: 0 5px 15px rgba(255,68,68,0.3);
+    transform: translateY(-2px);
+}
+
+.delete-button:disabled {
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.delete-icon {
+    transition: transform 0.3s ease;
+}
+
+.hover-shake:hover .delete-icon {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(2px); }
+    50% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+.spinner.small {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+/* Header actions styling */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+}

@@ -1,0 +1,23 @@
+.category-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #343a40;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+}
+
+.category-title:hover {
+    color: #667eea;
+}
+
+
+
+/* Optional responsive adjustments for the card titles */
+@media (max-width: 576px) {
+    .category-title {
+        font-size: 1.2rem;
+    }
+}
+

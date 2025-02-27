@@ -1,0 +1,12 @@
+/* Hero.css */
+#heroCarousel {
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    #heroCarousel img {
+        height: 300px;
+    }
+}

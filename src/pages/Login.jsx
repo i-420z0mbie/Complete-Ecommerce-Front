@@ -1,0 +1,159 @@
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api.js";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants.js";
+import { AuthContext } from "../contexts/AuthContext.jsx";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
+export default function Login({ onClose, toggleModal }) {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [success, setSuccess] = useState("");
+    const nav = useNavigate();
+    const { login } = useContext(AuthContext);
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        try {
+            const res = await api.post("/api/token/", { username, password });
+            login(res.data.access, res.data.refresh);
+            setSuccess("Login Successful!");
+            setTimeout(() => {
+                setSuccess("");
+                onClose();
+                // Retrieve the intended path from localStorage (set earlier in ProtectedRoute)
+                const next = localStorage.getItem("next") || "/";
+                localStorage.removeItem("next");
+                nav(next);
+            }, 1000);
+        } catch (error) {
+            setError("Invalid username or password");
+            console.error("Error logging in", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <>
+            <div className="card shadow-lg animate__animated animate__fadeIn">
+                <div className="card-body p-5">
+                    <h2 className="text-center mb-4 text-primary fw-bold">Welcome Back!</h2>
+                    <form onSubmit={handleLogin}>
+                        <div className="mb-4">
+                            <label htmlFor="username" className="form-label text-muted">
+                                Username
+                            </label>
+                            <div className="input-group">
+                <span className="input-group-text bg-transparent">
+                  <i className="bi bi-person-fill text-primary"></i>
+                </span>
+                                <input
+                                    type="text"
+                                    className="form-control form-control-lg border-start-0"
+                                    id="username"
+                                    placeholder="Enter username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    style={{ transition: "all 0.3s" }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="mb-4">
+                            <label htmlFor="password" className="form-label text-muted">
+                                Password
+                            </label>
+                            <div className="input-group">
+                <span className="input-group-text bg-transparent">
+                  <i className="bi bi-lock-fill text-primary"></i>
+                </span>
+                                <input
+                                    type="password"
+                                    className="form-control form-control-lg border-start-0"
+                                    id="password"
+                                    placeholder="Enter password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    style={{ transition: "all 0.3s" }}
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="btn btn-primary btn-lg w-100 rounded-pill mt-3"
+                            disabled={isSubmitting}
+                            style={{ transition: "all 0.3s", transform: "scale(1)" }}
+                            onMouseOver={(e) => (e.target.style.transform = "scale(1.02)")}
+                            onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
+                        >
+                            {isSubmitting ? (
+                                <div className="spinner-border spinner-border-sm" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                            ) : (
+                                "Login"
+                            )}
+                        </button>
+                    </form>
+
+                    {error && (
+                        <div className="alert alert-danger mt-4 animate__animated animate__shakeX" role="alert">
+                            {error}
+                        </div>
+                    )}
+                    {success && (
+                        <div className="alert alert-success mt-4 animate__animated animate__fadeIn" role="alert">
+                            {success}
+                        </div>
+                    )}
+                    <p className="text-center mt-3">
+                        Don't have an account?{" "}
+                        <button className="btn btn-link p-0" onClick={toggleModal}>
+                            Register
+                        </button>
+                    </p>
+                </div>
+            </div>
+            <style>
+                {`
+          @keyframes gradientShift {
+              0% { background-position: 0% 50%; }
+              50% { background-position: 100% 50%; }
+              100% { background-position: 0% 50%; }
+          }
+          .card {
+              border: none;
+              border-radius: 20px;
+              background: rgba(255, 255, 255, 0.95);
+              backdrop-filter: blur(10px);
+          }
+          .input-group-text {
+              border-right: none;
+              border-radius: 0.375rem 0 0 0.375rem;
+          }
+          .form-control:focus {
+              box-shadow: none;
+              border-color: #7c8ff7;
+          }
+          .btn-primary {
+              background: #667eea;
+              border: none;
+              padding: 12px 0;
+          }
+          .btn-primary:hover {
+              background: #5570e0;
+          }
+          .animate__fadeIn {
+              animation-duration: 0.8s;
+          }
+        `}
+            </style>
+        </>
+    );
+}
