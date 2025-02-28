@@ -270,7 +270,7 @@ const Navbar = ({ openModal }) => {
 
                 {/* Navigation Links */}
                 <div className="mobile-nav-links">
-                    <a href="/all-products" onClick={toggleMobileMenu}>
+                    <a href="/products" onClick={toggleMobileMenu}>
                         All Products
                     </a>
                     <a href="/category/bundle-deals" onClick={toggleMobileMenu}>

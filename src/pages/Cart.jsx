@@ -58,11 +58,13 @@ export default function CartPage() {
         }
     };
 
-    // Update calculateTotal to use unit_price
+    // Calculate overall cart total using the product price (fallback to 0 if not available)
     const calculateTotal = () => {
         return cartItems.reduce((sum, item) => {
-            const unitPrice = item.product?.unit_price ? parseFloat(item.product.unit_price) : 0;
-            const itemTotal = item.total_price || (unitPrice * item.quantity);
+            // Try to use unit_price first, then price
+            const raw = item.product?.unit_price ?? item.product?.price;
+            const price = raw ? parseFloat(raw) : 0;
+            const itemTotal = item.total_price || (price * item.quantity);
             return sum + itemTotal;
         }, 0);
     };
@@ -180,13 +182,20 @@ export default function CartPage() {
                                                                 )}
                                                             </button>
                                                         </div>
+                                                        {/* Creative Exclusive Offer Price display */}
                                                         <p className="text-muted mb-2">
-                                                            Unit Price: GH₵ {
-                                                            (() => {
-                                                                const unitPrice = item.product?.unit_price ? parseFloat(item.product.unit_price) : NaN;
-                                                                return isNaN(unitPrice) ? 'N/A' : unitPrice.toFixed(2);
-                                                            })()
-                                                        }
+                                                            Exclusive Offer Price:{" "}
+                                                            {(() => {
+                                                                // Try to use product.price first; if not available, display a creative message
+                                                                const raw = item.product?.price ?? item.product?.unit_price;
+                                                                if (raw === null || raw === undefined) {
+                                                                    return "Special Price Available Upon Checkout";
+                                                                }
+                                                                const price = parseFloat(raw);
+                                                                return isNaN(price)
+                                                                    ? "Special Price Available Upon Checkout"
+                                                                    : `GH₵ ${price.toFixed(2)}`;
+                                                            })()}
                                                         </p>
                                                         <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3">
                                                             <div className="btn-group">
@@ -221,14 +230,13 @@ export default function CartPage() {
                                                                 </button>
                                                             </div>
                                                             <div className="h5 mb-0 text-nowrap">
-                                                                Total: {
-                                                                (
+                                                                Total:{" "}
+                                                                {(
                                                                     item.total_price ||
-                                                                    (item.product?.unit_price
-                                                                        ? item.quantity * parseFloat(item.product.unit_price)
+                                                                    (item.product?.price || item.product?.unit_price
+                                                                        ? item.quantity * parseFloat(item.product?.price ?? item.product?.unit_price)
                                                                         : 0)
-                                                                ).toFixed(2)
-                                                            }
+                                                                ).toFixed(2)}
                                                             </div>
                                                         </div>
                                                     </div>

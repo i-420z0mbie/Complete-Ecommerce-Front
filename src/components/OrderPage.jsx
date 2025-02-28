@@ -39,7 +39,7 @@ const OrderPage = () => {
 
     // New Order button now navigates to the "all-products" page.
     const handlePlaceOrder = () => {
-        navigate("/all-products");
+        navigate("/products");
     };
 
     return (
@@ -84,7 +84,7 @@ const OrderPage = () => {
                 <div className="alert alert-info text-center">
                     No orders found.
                     <br />
-                    <Link to="/all-products">Place an order now</Link>
+                    <Link to="/products">Place an order now</Link>
                 </div>
             ) : (
                 <div className="row justify-content-center">
