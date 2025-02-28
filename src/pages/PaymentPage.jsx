@@ -28,6 +28,7 @@ const PaymentPage = () => {
         fetchOrder();
     }, [orderId]);
 
+
     const handleSuccess = (reference) => {
         console.log("Payment verified successfully:", reference);
         navigate(`/orders`);

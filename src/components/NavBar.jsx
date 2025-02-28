@@ -191,7 +191,7 @@ const Navbar = ({ openModal }) => {
 
     const toAllProduct = async (e) => {
         e.preventDefault();
-        navigate("/products");
+        navigate("/all-products");
     };
 
     // Smooth scrolling function
@@ -270,7 +270,7 @@ const Navbar = ({ openModal }) => {
 
                 {/* Navigation Links */}
                 <div className="mobile-nav-links">
-                    <a href="/products" onClick={toggleMobileMenu}>
+                    <a href="/all-products" onClick={toggleMobileMenu}>
                         All Products
                     </a>
                     <a href="/category/bundle-deals" onClick={toggleMobileMenu}>

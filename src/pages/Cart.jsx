@@ -13,6 +13,8 @@ export default function CartPage() {
     const [shippingAddress, setShippingAddress] = useState("");
     const [contactNumber, setContactNumber] = useState("");
     const [isCheckoutSubmitting, setIsCheckoutSubmitting] = useState(false);
+    const [updatingItems, setUpdatingItems] = useState([]);
+    const [removingItem, setRemovingItem] = useState(null);
 
     const navigate = useNavigate();
 
@@ -33,31 +35,38 @@ export default function CartPage() {
     const handleUpdateQuantity = async (itemId, newQuantity) => {
         if (newQuantity < 1) return;
         try {
+            setUpdatingItems(prev => [...prev, itemId]);
             await api.patch(`/store/cart-items/${itemId}/`, { quantity: newQuantity });
             const { data } = await api.get("/store/cart-items/");
             setCartItems(Array.isArray(data) ? data : data.results);
         } catch (err) {
             setError("Failed to update quantity. Please try again.");
+        } finally {
+            setUpdatingItems(prev => prev.filter(id => id !== itemId));
         }
     };
 
     const handleRemoveItem = async (itemId) => {
         try {
+            setRemovingItem(itemId);
             await api.delete(`/store/cart-items/${itemId}/`);
             setCartItems((items) => items.filter((item) => item.id !== itemId));
         } catch (err) {
             setError("Failed to remove item. Please try again.");
+        } finally {
+            setRemovingItem(null);
         }
     };
 
+    // Update calculateTotal to use unit_price
     const calculateTotal = () => {
         return cartItems.reduce((sum, item) => {
-            const itemTotal = item.total_price || (item.product?.price ? item.quantity * item.product.price : 0);
+            const unitPrice = item.product?.unit_price ? parseFloat(item.product.unit_price) : 0;
+            const itemTotal = item.total_price || (unitPrice * item.quantity);
             return sum + itemTotal;
         }, 0);
     };
 
-    // Handle checkout when the user submits shipping details
     const handleCheckoutSubmit = async (e) => {
         e.preventDefault();
         if (!shippingAddress || !contactNumber) {
@@ -71,17 +80,14 @@ export default function CartPage() {
                 shipping_address: shippingAddress,
                 contact_info: contactNumber,
             });
-            console.log("Order created:", response.data);
             navigate(`/order/${response.data.id}`);
         } catch (err) {
-            console.error("Error placing order:", err);
             setError("Failed to place order. Please try again.");
         } finally {
             setIsCheckoutSubmitting(false);
         }
     };
 
-    // Toggle display of checkout form
     const handleCheckout = () => {
         setShowCheckoutForm(true);
     };
@@ -143,53 +149,86 @@ export default function CartPage() {
                                             className="col-12"
                                         >
                                             <div className="card shadow-sm hover-shadow-lg transition-all">
-                                                <div className="card-body d-flex gap-4">
-                                                    <img
-                                                        src={
-                                                            item.product?.images?.length > 0
-                                                                ? item.product.images[0].image
-                                                                : '/placeholder-product.jpg'
-                                                        }
-                                                        alt={item.product?.name || "Product Image"}
-                                                        className="rounded-3"
-                                                        style={{ width: '120px', height: '120px', objectFit: 'contain' }}
-                                                        loading="lazy"
-                                                    />
-                                                    <div className="flex-grow-1">
+                                                <div className="card-body d-flex gap-3">
+                                                    <div className="col-3 col-md-2">
+                                                        <img
+                                                            src={
+                                                                item.product?.images?.length > 0
+                                                                    ? item.product.images[0].image
+                                                                    : '/placeholder-product.jpg'
+                                                            }
+                                                            alt={item.product?.name || "Product Image"}
+                                                            className="rounded-3 img-fluid"
+                                                            style={{ height: '120px', objectFit: 'contain' }}
+                                                            loading="lazy"
+                                                        />
+                                                    </div>
+                                                    <div className="col-9 col-md-10">
                                                         <div className="d-flex justify-content-between align-items-start mb-2">
-                                                            <h5 className="mb-0">
+                                                            <h5 className="mb-0 text-truncate pe-3">
                                                                 {item.product?.name || "Unnamed Product"}
                                                             </h5>
                                                             <button
                                                                 onClick={() => handleRemoveItem(item.id)}
                                                                 className="btn btn-link text-danger p-0"
+                                                                disabled={removingItem === item.id}
                                                             >
-                                                                <FontAwesomeIcon icon={faTimes} />
+                                                                {removingItem === item.id ? (
+                                                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                                ) : (
+                                                                    <FontAwesomeIcon icon={faTimes} />
+                                                                )}
                                                             </button>
                                                         </div>
                                                         <p className="text-muted mb-2">
-                                                            Unit Price: GH₵ {item.product?.unit_price || 'N/A'}
+                                                            Unit Price: GH₵ {
+                                                            (() => {
+                                                                const unitPrice = item.product?.unit_price ? parseFloat(item.product.unit_price) : NaN;
+                                                                return isNaN(unitPrice) ? 'N/A' : unitPrice.toFixed(2);
+                                                            })()
+                                                        }
                                                         </p>
-                                                        <div className="d-flex align-items-center gap-3">
+                                                        <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3">
                                                             <div className="btn-group">
                                                                 <button
                                                                     className="btn btn-outline-secondary"
                                                                     onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                                                    disabled={updatingItems.includes(item.id)}
                                                                 >
-                                                                    <FontAwesomeIcon icon={faMinus} />
+                                                                    {updatingItems.includes(item.id) ? (
+                                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                                    ) : (
+                                                                        <FontAwesomeIcon icon={faMinus} />
+                                                                    )}
                                                                 </button>
                                                                 <span className="btn px-4">
-                                                                    {item.quantity}
+                                                                    {updatingItems.includes(item.id) ? (
+                                                                        <span className="spinner-border spinner-border-sm text-primary" role="status"></span>
+                                                                    ) : (
+                                                                        item.quantity
+                                                                    )}
                                                                 </span>
                                                                 <button
                                                                     className="btn btn-outline-secondary"
                                                                     onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                                                                    disabled={updatingItems.includes(item.id)}
                                                                 >
-                                                                    <FontAwesomeIcon icon={faPlus} />
+                                                                    {updatingItems.includes(item.id) ? (
+                                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                                    ) : (
+                                                                        <FontAwesomeIcon icon={faPlus} />
+                                                                    )}
                                                                 </button>
                                                             </div>
-                                                            <div className="h5 mb-0">
-                                                                GH₵ {(item.total_price || (item.product?.price * item.quantity) || 0).toFixed(2)}
+                                                            <div className="h5 mb-0 text-nowrap">
+                                                                Total: {
+                                                                (
+                                                                    item.total_price ||
+                                                                    (item.product?.unit_price
+                                                                        ? item.quantity * parseFloat(item.product.unit_price)
+                                                                        : 0)
+                                                                ).toFixed(2)
+                                                            }
                                                             </div>
                                                         </div>
                                                     </div>
@@ -218,7 +257,6 @@ export default function CartPage() {
                                                     <span>GH₵ {calculateTotal().toFixed(2)}</span>
                                                 </div>
                                                 {showCheckoutForm ? (
-                                                    // Checkout form for shipping & contact info
                                                     <form onSubmit={handleCheckoutSubmit}>
                                                         <div className="mb-3">
                                                             <label htmlFor="shippingAddress" className="form-label">

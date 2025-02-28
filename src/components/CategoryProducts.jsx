@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api";
 import { Heart, HeartFill } from "react-bootstrap-icons";
@@ -91,17 +91,13 @@ export default function CategoryProducts() {
                                 <img
                                     src={product.images[0].image}
                                     alt={product.name}
-                                    className="card-img-top"
-                                    style={{
-                                        objectFit: "cover",
-                                        height: "200px",
-                                        width: "100%",
-                                    }}
+                                    className="img-fluid object-fit-md-contain"
+                                    loading="lazy"
                                 />
                             ) : (
                                 <div
                                     className="card-img-top bg-secondary"
-                                    style={{ height: "200px" }}
+                                    style={{ height: "400px" }}
                                 ></div>
                             )}
                             <div className="card-body d-flex flex-column">

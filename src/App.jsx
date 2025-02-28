@@ -68,7 +68,7 @@ function AppContent() {
                     element={<CategoryProducts />}
                 />
                 <Route path="/store/products/:id" element={<ProductsDetail />} />
-                <Route path="/products" element={<ProductsList />} />
+                <Route path="/all-products" element={<ProductsList />} />
 
                 {/* Protected Routes */}
                 <Route

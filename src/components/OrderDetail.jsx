@@ -86,12 +86,23 @@ const OrderDetail = () => {
                             </div>
                         </div>
                     )}
+
+                    <div className="go-to-orders">
+                        <Link to="/orders" className="orders-button">
+                            ← Go to Orders
+                        </Link>
+                    </div>
                 </div>
             ) : (
                 <div className="not-found-card scale-in">
                     <div className="empty-icon">📭</div>
                     <h2>Order Not Found</h2>
                     <p>The requested order could not be located</p>
+                    <div className="go-to-orders">
+                        <Link to="/orders" className="orders-button">
+                            ← Go to Orders
+                        </Link>
+                    </div>
                 </div>
             )}
         </div>

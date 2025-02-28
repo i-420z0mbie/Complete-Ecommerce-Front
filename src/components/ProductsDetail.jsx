@@ -29,6 +29,9 @@ const ProductsDetail = () => {
     const [isContactingSeller, setIsContactingSeller] = useState(false);
     const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
 
+    // New state for added notification
+    const [showAddedNotification, setShowAddedNotification] = useState(false);
+
     // Refs for sections (smooth scrolling, etc.)
     const sectionRefs = {
         description: useRef(null),
@@ -65,6 +68,10 @@ const ProductsDetail = () => {
             // Pass the custom flag to bypass token refresh for this call
             await addToCart(product.id, quantity, { skipAuthRefresh: true });
             toast.success("Product added to cart!");
+            setShowAddedNotification(true);
+            setTimeout(() => {
+                setShowAddedNotification(false);
+            }, 2000);
         } catch (err) {
             console.error("Error adding product to cart:", err.response || err.message);
             if (err.response && err.response.status === 401) {
@@ -297,6 +304,11 @@ const ProductsDetail = () => {
                             )}
                         </button>
                     </div>
+                    {showAddedNotification && (
+                        <div className="alert alert-success mt-3" role="alert">
+                            Item added to cart!
+                        </div>
+                    )}
                     <div className="alert alert-info">
                         <i className="bi bi-truck me-2"></i>
                         Free shipping on orders over GH₵500
