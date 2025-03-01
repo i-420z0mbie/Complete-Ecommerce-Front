@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../api.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Heart, HeartFill } from "react-bootstrap-icons";
+import "animate.css/animate.min.css";
 
 export default function ProductsList() {
     const [products, setProducts] = useState([]);
@@ -42,7 +43,7 @@ export default function ProductsList() {
         fetchWishlist();
     }, []);
 
-    // Toggle wishlist status using normal alerts for feedback.
+    // Toggle wishlist status using alerts for feedback.
     // Note: We pass { skipAuthRefresh: true } to bypass the token refresh interceptor.
     const toggleWishlist = async (productId, e) => {
         e.stopPropagation();
@@ -83,88 +84,219 @@ export default function ProductsList() {
         return wishlist.some(item => item.product === productId);
     };
 
-    // Loading state
+    // Render stars for product rating (ratings out of 5)
+    const renderStars = (rating) => {
+        const starStyle = { fontSize: "0.8rem" };
+        const stars = [];
+        for (let i = 1; i <= 5; i++) {
+            if (rating >= i) {
+                stars.push(<i key={i} className="bi bi-star-fill text-warning" style={starStyle}></i>);
+            } else if (rating >= i - 0.5) {
+                stars.push(<i key={i} className="bi bi-star-half text-warning" style={starStyle}></i>);
+            } else {
+                stars.push(<i key={i} className="bi bi-star text-warning" style={starStyle}></i>);
+            }
+        }
+        return stars;
+    };
+
+    // Loading state with enhanced animation
     if (isLoading) {
         return (
             <div className="container my-5 text-center">
-                <div className="spinner-border" role="status">
+                <div
+                    className="spinner-border text-primary animate__animated animate__pulse animate__infinite"
+                    style={{ width: "3rem", height: "3rem" }}
+                    role="status"
+                >
                     <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3 text-muted animate__animated animate__fadeIn">
+                    Curating Amazing Products...
+                </p>
+            </div>
+        );
+    }
+
+    // Error state with enhanced styling
+    if (error) {
+        return (
+            <div className="container my-5 animate__animated animate__shakeX">
+                <div
+                    className="alert alert-danger text-center shadow-lg"
+                    style={{ borderRadius: "20px" }}
+                >
+                    ⚠️ {error}
                 </div>
             </div>
         );
     }
 
-    // Error state
-    if (error) {
-        return (
-            <div className="container my-5">
-                <div className="alert alert-danger text-center">{error}</div>
-            </div>
-        );
-    }
-
-    // Main render: product list
+    // Main render: product list with enhanced UI & animations
     return (
         <div className="container my-5">
-            <div className="row">
-                {products.map((product) => (
-                    <div key={product.id} className="col-md-4 col-sm-6 mb-4">
+            <div className="row g-4">
+                {products.map((product, index) => (
+                    <div
+                        key={product.id}
+                        className="col-md-4 col-sm-6"
+                        style={{
+                            animation: `fadeInUp 0.5s ease-out ${index * 0.1}s`,
+                            animationFillMode: "backwards"
+                        }}
+                    >
                         <div
-                            className="card h-100 shadow-sm hover-effect"
+                            className="card h-100 shadow-lg border-0 overflow-hidden product-card"
                             onClick={() => nav(`/store/products/${product.id}`)}
+                            style={{
+                                borderRadius: "15px",
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                cursor: "pointer"
+                            }}
                         >
+                            {/* Wishlist Button with animations */}
                             <div
                                 className="wishlist-button"
                                 onClick={(e) => toggleWishlist(product.id, e)}
                                 style={{
                                     position: "absolute",
-                                    top: "10px",
-                                    right: "10px",
+                                    top: "15px",
+                                    right: "15px",
                                     zIndex: 2,
                                     cursor: "pointer",
+                                    transition: "transform 0.3s",
                                 }}
+                                onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.2)"}
+                                onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
                             >
                                 {wishlistLoading.includes(product.id) ? (
-                                    <div className="spinner-border spinner-border-sm text-primary" role="status">
-                                        <span className="visually-hidden">Loading...</span>
-                                    </div>
+                                    <div
+                                        className="spinner-border spinner-border-sm text-primary"
+                                        style={{ animation: "pulse 1s infinite" }}
+                                        role="status"
+                                    />
                                 ) : (
                                     isInWishlist(product.id) ? (
-                                        <HeartFill className="text-danger" size={24} />
+                                        <HeartFill className="text-danger animate__animated animate__heartBeat" size={28} />
                                     ) : (
-                                        <Heart className="text-muted" size={24} />
+                                        <Heart
+                                            className="text-white animate__animated animate__pulse"
+                                            size={28}
+                                            style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}
+                                        />
                                     )
                                 )}
                             </div>
-                            {product.images && product.images.length > 0 ? (
-                                <img
-                                    src={product.images[0].image}
-                                    alt={product.name}
-                                    className="img-fluid object-fit-md-contain"
-                                    loading="lazy"
-                                />
-                            ) : (
-                                <div className="card-img-top bg-secondary" style={{ height: "200px" }}></div>
-                            )}
-                            <div className="card-body">
-                                <h5 className="card-title">{product.name}</h5>
-                                <p className="card-text">GH₵ {product.unit_price}</p>
+
+                            {/* Product Image with Hover Zoom */}
+                            <div className="overflow-hidden position-relative" style={{ height: "250px" }}>
+                                {product.images && product.images.length > 0 ? (
+                                    <img
+                                        src={product.images[0].image}
+                                        alt={product.name}
+                                        className="img-fluid h-100 w-100 object-fit-cover product-image"
+                                        loading="lazy"
+                                        style={{ transition: "transform 0.3s ease-out" }}
+                                    />
+                                ) : (
+                                    <div className="h-100 w-100 bg-gradient-secondary d-flex align-items-center justify-content-center">
+                                        <span className="text-white">No Image</span>
+                                    </div>
+                                )}
                             </div>
-                            <div className="card-footer bg-transparent border-top">
-                                <button
-                                    className="btn btn-outline-primary w-100"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        nav(`/store/products/${product.id}`);
-                                    }}
-                                >
-                                    View Product
-                                </button>
+
+                            {/* Product Details */}
+                            <div className="card-body position-relative bg-light">
+                                <div
+                                    className="position-absolute top-0 start-0 w-100 bg-primary"
+                                    style={{ height: "4px", transform: "translateY(-100%)" }}
+                                />
+                                <h5 className="card-title fw-bold mb-3 text-truncate">
+                                    {product.name}
+                                </h5>
+                                {/* Inventory and Ratings */}
+                                <div className="mb-2">
+                                    {product.inventory > 0 ? (
+                                        <span className="badge bg-success me-2">
+                                            In Stock: {product.inventory}
+                                        </span>
+                                    ) : (
+                                        <span className="badge bg-danger me-2">
+                                            Out of Stock
+                                        </span>
+                                    )}
+                                    {product.average_rating != null && (
+                                        <span>{renderStars(product.average_rating)}</span>
+                                    )}
+                                </div>
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <p className="card-text fs-4 fw-bold text-primary mb-0">
+                                        GH₵ {product.unit_price}
+                                    </p>
+                                    <button
+                                        className="btn btn-primary rounded-pill px-4 py-2"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            nav(`/store/products/${product.id}`);
+                                        }}
+                                        style={{
+                                            transition: "all 0.3s",
+                                            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = "translateY(-2px)";
+                                            e.currentTarget.style.boxShadow = "0 6px 8px rgba(0, 0, 0, 0.15)";
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = "translateY(0)";
+                                            e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+                                        }}
+                                    >
+                                        View Product
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {/* Custom CSS Animations and Styling */}
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .product-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+                }
+
+                .product-image:hover {
+                    transform: scale(1.05);
+                }
+
+                .hover-effect:hover {
+                    transform: scale(1.02);
+                }
+
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                    100% { transform: scale(1); }
+                }
+
+                .bg-gradient-secondary {
+                    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+                }
+            `}</style>
         </div>
     );
 }

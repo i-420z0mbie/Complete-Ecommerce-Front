@@ -1,4 +1,3 @@
-// src/components/ProductsDetail.jsx
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api";
@@ -32,6 +31,9 @@ const ProductsDetail = () => {
     // New state for added notification
     const [showAddedNotification, setShowAddedNotification] = useState(false);
 
+    // New state for the currently showcased image
+    const [selectedImage, setSelectedImage] = useState(null);
+
     // Refs for sections (smooth scrolling, etc.)
     const sectionRefs = {
         description: useRef(null),
@@ -56,6 +58,13 @@ const ProductsDetail = () => {
         };
         fetchProduct();
     }, [id]);
+
+    // When the product loads, set the first image as the default selected image
+    useEffect(() => {
+        if (product && product.images && product.images.length > 0) {
+            setSelectedImage(product.images[0].image);
+        }
+    }, [product]);
 
     const handleAddToCart = useCallback(async () => {
         if (!product || product.inventory < 1) {
@@ -146,7 +155,7 @@ const ProductsDetail = () => {
         } catch (err) {
             console.error("Error in Buy Now:", err.response || err.message);
             if (err.response && err.response.status === 401) {
-                alert("You need to log in to perform task.");
+                alert("You need to log in purchase a product.");
             } else {
                 toast.error("Failed. Try again later");
             }
@@ -223,9 +232,9 @@ const ProductsDetail = () => {
                 {/* Image Gallery */}
                 <div className="col-md-6">
                     <div className="ratio ratio-1x1 bg-light rounded-3 overflow-hidden">
-                        {product.images && product.images.length > 0 ? (
+                        {selectedImage ? (
                             <img
-                                src={product.images[0].image}
+                                src={selectedImage}
                                 alt={product.name}
                                 className="img-fluid object-fit-md-contain"
                                 loading="lazy"
@@ -236,6 +245,21 @@ const ProductsDetail = () => {
                             </div>
                         )}
                     </div>
+                    {/* Thumbnails */}
+                    {product.images && product.images.length > 1 && (
+                        <div className="d-flex gap-2 mt-3">
+                            {product.images.map((img, idx) => (
+                                <img
+                                    key={idx}
+                                    src={img.image}
+                                    alt={`${product.name} thumbnail ${idx + 1}`}
+                                    className={`img-thumbnail ${selectedImage === img.image ? "border-primary" : ""}`}
+                                    style={{ width: "80px", height: "80px", objectFit: "cover", cursor: "pointer" }}
+                                    onClick={() => setSelectedImage(img.image)}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Product Info */}
@@ -466,8 +490,8 @@ const ProductsDetail = () => {
                                         <div className="d-flex align-items-center gap-3 mb-2">
                                             <h3 className="mb-0">{product.store?.name || "Official Store"}</h3>
                                             <span className="badge bg-primary">
-                                                <i className="bi bi-patch-check-fill me-2"></i>Verified
-                                            </span>
+                        <i className="bi bi-patch-check-fill me-2"></i>Verified
+                      </span>
                                         </div>
                                         {/* Store Description */}
                                         {product.store?.description && (
