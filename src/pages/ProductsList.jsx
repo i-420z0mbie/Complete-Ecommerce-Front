@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../api.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Heart, HeartFill } from "react-bootstrap-icons";
-import "animate.css/animate.min.css";
+import { motion } from "framer-motion";
 
 export default function ProductsList() {
     const [products, setProducts] = useState([]);
@@ -43,15 +43,10 @@ export default function ProductsList() {
         fetchWishlist();
     }, []);
 
-    // Toggle wishlist status using alerts for feedback.
-    // Note: We pass { skipAuthRefresh: true } to bypass the token refresh interceptor.
     const toggleWishlist = async (productId, e) => {
         e.stopPropagation();
-        // Add productId to wishlistLoading to show loading animation
         setWishlistLoading(prev => [...prev, productId]);
-
         const existingItem = wishlist.find(item => item.product === productId);
-
         try {
             if (existingItem) {
                 await api.delete(`/store/wishlists/${existingItem.id}/`, { skipAuthRefresh: true });
@@ -74,7 +69,6 @@ export default function ProductsList() {
                 alert("An error occurred while updating your wishlist. (Error Status: " + status + ")");
             }
         } finally {
-            // Remove productId from wishlistLoading after the request completes
             setWishlistLoading(prev => prev.filter(id => id !== productId));
         }
     };
@@ -100,61 +94,56 @@ export default function ProductsList() {
         return stars;
     };
 
-    // Loading state with enhanced animation
     if (isLoading) {
         return (
-            <div className="container my-5 text-center">
-                <div
-                    className="spinner-border text-primary animate__animated animate__pulse animate__infinite"
-                    style={{ width: "3rem", height: "3rem" }}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="container my-6 text-center">
+                <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ rotate: 360, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                    className="spinner-border text-primary"
+                    style={{ width: "4rem", height: "4rem" }}
                     role="status"
                 >
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-                <p className="mt-3 text-muted animate__animated animate__fadeIn">
-                    Curating Amazing Products...
-                </p>
-            </div>
+                    <span className="visually-hidden">Loading products...</span>
+                </motion.div>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 h5 text-muted">
+                    Curating Your Selection...
+                </motion.p>
+            </motion.div>
         );
     }
 
-    // Error state with enhanced styling
     if (error) {
         return (
-            <div className="container my-5 animate__animated animate__shakeX">
-                <div
-                    className="alert alert-danger text-center shadow-lg"
-                    style={{ borderRadius: "20px" }}
-                >
-                    ⚠️ {error}
-                </div>
-            </div>
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="container my-5">
+                <div className="alert alert-danger text-center">{error}</div>
+            </motion.div>
         );
     }
 
-    // Main render: product list with enhanced UI & animations
     return (
-        <div className="container my-5">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="container my-5">
             <div className="row g-4">
                 {products.map((product, index) => (
-                    <div
+                    <motion.div
                         key={product.id}
-                        className="col-md-4 col-sm-6"
-                        style={{
-                            animation: `fadeInUp 0.5s ease-out ${index * 0.1}s`,
-                            animationFillMode: "backwards"
-                        }}
+                        className="col-xl-4 col-lg-4 col-md-6"
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
                     >
                         <div
-                            className="card h-100 shadow-lg border-0 overflow-hidden product-card"
-                            onClick={() => nav(`/store/products/${product.id}`)}
+                            className="card h-100 shadow-lg border-0 overflow-hidden product-card hover-effect"
                             style={{
-                                borderRadius: "15px",
+                                borderRadius: "20px",
                                 transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                cursor: "pointer"
+                                cursor: "pointer",
+                                minWidth: "350px"
                             }}
+                            onClick={() => nav(`/store/products/${product.id}`)}
                         >
-                            {/* Wishlist Button with animations */}
+                            {/* Wishlist Button */}
                             <div
                                 className="wishlist-button"
                                 onClick={(e) => toggleWishlist(product.id, e)}
@@ -166,8 +155,8 @@ export default function ProductsList() {
                                     cursor: "pointer",
                                     transition: "transform 0.3s",
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.2)"}
-                                onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.2)")}
+                                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                             >
                                 {wishlistLoading.includes(product.id) ? (
                                     <div
@@ -177,10 +166,10 @@ export default function ProductsList() {
                                     />
                                 ) : (
                                     isInWishlist(product.id) ? (
-                                        <HeartFill className="text-danger animate__animated animate__heartBeat" size={28} />
+                                        <HeartFill className="text-danger" size={28} />
                                     ) : (
                                         <Heart
-                                            className="text-white animate__animated animate__pulse"
+                                            className="text-white"
                                             size={28}
                                             style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}
                                         />
@@ -188,115 +177,105 @@ export default function ProductsList() {
                                 )}
                             </div>
 
-                            {/* Product Image with Hover Zoom */}
-                            <div className="overflow-hidden position-relative" style={{ height: "250px" }}>
+                            {/* Product Image with Hover Effect */}
+                            <div className="image-container overflow-hidden position-relative" style={{ height: "320px" }}>
                                 {product.images && product.images.length > 0 ? (
-                                    <img
+                                    <motion.img
                                         src={product.images[0].image}
                                         alt={product.name}
-                                        className="img-fluid h-100 w-100 object-fit-cover product-image"
+                                        className="img-fluid h-100 w-100 object-fit-contain"
                                         loading="lazy"
-                                        style={{ transition: "transform 0.3s ease-out" }}
+                                        whileHover={{ scale: 1.1 }}
+                                        transition={{ type: "spring", stiffness: 400 }}
                                     />
                                 ) : (
                                     <div className="h-100 w-100 bg-gradient-secondary d-flex align-items-center justify-content-center">
-                                        <span className="text-white">No Image</span>
+                                        <span className="text-white">📷 Image Coming Soon!</span>
                                     </div>
                                 )}
+                                <div className="gradient-overlay" />
                             </div>
 
                             {/* Product Details */}
                             <div className="card-body position-relative bg-light">
                                 <div
                                     className="position-absolute top-0 start-0 w-100 bg-primary"
-                                    style={{ height: "4px", transform: "translateY(-100%)" }}
+                                    style={{ height: "3px", transform: "translateY(-100%)" }}
                                 />
-                                <h5 className="card-title fw-bold mb-3 text-truncate">
-                                    {product.name}
-                                </h5>
-                                {/* Inventory and Ratings */}
+                                <h5 className="card-title fw-bold mb-3 text-truncate">{product.name}</h5>
+                                <p className="card-text small text-muted">
+                                    {product.description
+                                        ? product.description.slice(0, 80) + "..."
+                                        : "No description available."}
+                                </p>
                                 <div className="mb-2">
                                     {product.inventory > 0 ? (
-                                        <span className="badge bg-success me-2">
-                                            In Stock: {product.inventory}
-                                        </span>
+                                        <span className="badge bg-success me-2">In Stock: {product.inventory}</span>
                                     ) : (
-                                        <span className="badge bg-danger me-2">
-                                            Out of Stock
-                                        </span>
+                                        <span className="badge bg-danger me-2">Out of Stock</span>
                                     )}
                                     {product.average_rating != null && (
-                                        <span>{renderStars(product.average_rating)}</span>
+                                        <span>
+                                            {renderStars(product.average_rating)}{" "}
+                                            <small>({product.reviews?.length || 0} reviews)</small>
+                                        </span>
                                     )}
                                 </div>
                                 <div className="d-flex justify-content-between align-items-center">
-                                    <p className="card-text fs-4 fw-bold text-primary mb-0">
+                                    <p className="card-text fs-4 fw-bold text-gradient-primary mb-0">
                                         GH₵ {product.unit_price}
                                     </p>
-                                    <button
-                                        className="btn btn-primary rounded-pill px-4 py-2"
+                                    <motion.button
+                                        className="btn btn-gradient-primary rounded-pill px-4"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             nav(`/store/products/${product.id}`);
                                         }}
-                                        style={{
-                                            transition: "all 0.3s",
-                                            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.transform = "translateY(-2px)";
-                                            e.currentTarget.style.boxShadow = "0 6px 8px rgba(0, 0, 0, 0.15)";
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = "translateY(0)";
-                                            e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
-                                        }}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
                                     >
-                                        View Product
-                                    </button>
+                                        Explore ➔
+                                    </motion.button>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
             </div>
-
-            {/* Custom CSS Animations and Styling */}
-            <style>{`
-                @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+            <style jsx="true">{`
+                .gradient-overlay {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 40%;
+                    background: linear-gradient(transparent, rgba(0, 0, 0, 0.1));
                 }
-
                 .product-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+                    transform: translateY(-10px) rotateZ(1deg);
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
                 }
-
-                .product-image:hover {
-                    transform: scale(1.05);
+                .text-gradient-primary {
+                    background: linear-gradient(45deg, #007bff, #00ff88);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    -webkit-text-fill-color: transparent;
                 }
-
-                .hover-effect:hover {
-                    transform: scale(1.02);
+                .btn-gradient-primary {
+                    background: linear-gradient(45deg, #007bff, #00ff88);
+                    border: none;
+                    color: white;
+                    transition: all 0.3s ease;
                 }
-
-                @keyframes pulse {
-                    0% { transform: scale(1); }
-                    50% { transform: scale(1.1); }
-                    100% { transform: scale(1); }
-                }
-
                 .bg-gradient-secondary {
                     background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
                 }
+                .glass-card {
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                }
             `}</style>
-        </div>
+        </motion.div>
     );
 }
