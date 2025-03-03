@@ -177,7 +177,7 @@ export default function ProductsList() {
                                 )}
                             </div>
 
-                            {/* Product Image with Hover Effect */}
+
                             <div className="image-container overflow-hidden position-relative" style={{ height: "320px" }}>
                                 {product.images && product.images.length > 0 ? (
                                     <motion.img
@@ -196,7 +196,7 @@ export default function ProductsList() {
                                 <div className="gradient-overlay" />
                             </div>
 
-                            {/* Product Details */}
+
                             <div className="card-body position-relative bg-light">
                                 <div
                                     className="position-absolute top-0 start-0 w-100 bg-primary"

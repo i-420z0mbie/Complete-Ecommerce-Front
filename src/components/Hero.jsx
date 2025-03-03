@@ -31,7 +31,7 @@ const Hero = () => {
             },
             {
                 id: 4,
-                title: "Jewelly & Watches",
+                title: "Jewelry & Watches",
                 description: "Find what makes you glow!",
                 image: "/hero_images/jewellry.jpg",
                 link: "/deals",
@@ -47,7 +47,7 @@ const Hero = () => {
             id="heroCarousel"
             className="carousel slide carousel-fade"
             data-bs-ride="carousel"
-            data-bs-interval="5000" // Consistent interval for all devices
+            data-bs-interval="5000"
         >
             <div className="carousel-inner">
                 {heroImages.map((hero, index) => (
@@ -59,13 +59,8 @@ const Hero = () => {
                             src={hero.image}
                             className="d-block w-100 hero-image"
                             alt={hero.title || "Hero"}
-                            style={{
-                                height: "500px",
-                                objectFit: "cover",
-                                objectPosition: "center",
-                            }}
                         />
-                        <div className="carousel-caption d-none d-md-block">
+                        <div className="carousel-caption">
                             {hero.title && <h5>{hero.title}</h5>}
                             {hero.description && <p>{hero.description}</p>}
                             {hero.link && (
