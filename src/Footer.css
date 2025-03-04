@@ -21,6 +21,18 @@
     animation: gradientFlow 15s ease infinite;
 }
 
+
+.footer-link {
+    color: #fff !important;
+}
+
+.footer-link:hover,
+.footer-link:focus {
+    color: #fff !important;
+}
+
+
+
 .glow-text {
     animation: glow 2s ease-in-out infinite;
 }

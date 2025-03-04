@@ -34,7 +34,7 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Quick Links with Hover Effects */}
+
                     <div className="col-xl-2 col-lg-4 col-md-6">
                         <h5 className="footer-heading mb-4">Explore</h5>
                         <ul className="list-unstyled">
