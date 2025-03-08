@@ -5,11 +5,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export default function Register({ onClose, toggleModal }) {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [success, setSuccess] = useState("");
@@ -17,25 +17,65 @@ export default function Register({ onClose, toggleModal }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
+        setSuccess("");
         setIsSubmitting(true);
+
+        // Client-side validations:
+        if (!email) {
+            setError("Email is required.");
+            setIsSubmitting(false);
+            return;
+        }
+        if (!username) {
+            setError("Username is required.");
+            setIsSubmitting(false);
+            return;
+        }
+        if (!password) {
+            setError("Password is required.");
+            setIsSubmitting(false);
+            return;
+        }
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters long.");
+            setIsSubmitting(false);
+            return;
+        }
+        if (password !== confirmPassword) {
+            setError("Passwords do not match.");
+            setIsSubmitting(false);
+            return;
+        }
+
         try {
-            await api.post("/api/user/create/", {
-                first_name: firstName,
-                last_name: lastName,
+            // Include re_password field as required by Djoser
+            await api.post("/auth/users/", {
                 email,
                 username,
                 password,
+                re_password: confirmPassword,
             });
-            setSuccess("Registration Successful!");
-            // After 2 seconds, close the registration modal and open the login modal
+            setSuccess("Thank You for joining us... To the Login Page!✈️");
             setTimeout(() => {
                 setSuccess("");
                 onClose();
-                toggleModal(); // Open login modal instead of navigating to '/login'
+                toggleModal();
             }, 2000);
-        } catch (error) {
-            setError("Error registering your account!");
-            console.error(error);
+        } catch (err) {
+            if (err.response && err.response.data) {
+                const errors = err.response.data;
+                let errorMessages = [];
+                for (const key in errors) {
+                    if (errors.hasOwnProperty(key)) {
+                        errorMessages.push(`${key}: ${errors[key].join(" ")}`);
+                    }
+                }
+                setError(errorMessages.join(" | "));
+            } else {
+                setError("Error registering your account!");
+            }
+            console.error(err);
         } finally {
             setIsSubmitting(false);
         }
@@ -48,24 +88,6 @@ export default function Register({ onClose, toggleModal }) {
                     <h2 className="text-center mb-4 text-primary fw-bold">Create an Account</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
-                            <label className="form-label text-muted">First Name</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label text-muted">Last Name</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
                             <label className="form-label text-muted">Email</label>
                             <input
                                 type="email"
@@ -77,9 +99,9 @@ export default function Register({ onClose, toggleModal }) {
                         <div className="mb-3">
                             <label className="form-label text-muted">Username</label>
                             <div className="input-group">
-                <span className="input-group-text bg-transparent">
-                  <i className="bi bi-person-fill text-primary"></i>
-                </span>
+                                <span className="input-group-text bg-transparent">
+                                    <i className="bi bi-person-fill text-primary"></i>
+                                </span>
                                 <input
                                     type="text"
                                     className="form-control form-control-lg border-start-0"
@@ -91,14 +113,39 @@ export default function Register({ onClose, toggleModal }) {
                         <div className="mb-3">
                             <label className="form-label text-muted">Password</label>
                             <div className="input-group">
-                <span className="input-group-text bg-transparent">
-                  <i className="bi bi-lock-fill text-primary"></i>
-                </span>
+                                <span className="input-group-text bg-transparent">
+                                    <i className="bi bi-lock-fill text-primary"></i>
+                                </span>
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     className="form-control form-control-lg border-start-0"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                />
+                                <span
+                                    className="input-group-text bg-transparent"
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? (
+                                        <i className="bi bi-eye-slash-fill text-primary"></i>
+                                    ) : (
+                                        <i className="bi bi-eye-fill text-primary"></i>
+                                    )}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label text-muted">Confirm Password</label>
+                            <div className="input-group">
+                                <span className="input-group-text bg-transparent">
+                                    <i className="bi bi-lock-fill text-primary"></i>
+                                </span>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    className="form-control form-control-lg border-start-0"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
                                 />
                             </div>
                         </div>

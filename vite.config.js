@@ -5,17 +5,17 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0', // Bind to all network interfaces
-    port: process.env.PORT ? Number(process.env.PORT) : 5173, // Use Render's PORT if provided, otherwise default to 5173
+    port: process.env.PORT ? Number(process.env.PORT) : 5173,
     proxy: {
-      // Proxy requests starting with /api to your Django backend
+
       '/api': {
-        target: 'https://zombified-store.onrender.com', // Your Django backend URL
+        target: 'https://zombified-store.onrender.com',
         changeOrigin: true,
-        secure: false, // Set to true if your backend has a valid SSL certificate
+        secure: false,
       },
     },
   },
   preview: {
-    allowedHosts: ['zombified-store.onrender.com'], // Allow the Django backend host
+    allowedHosts: ['zombified-store.onrender.com'],
   },
 })

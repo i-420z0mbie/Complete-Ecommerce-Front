@@ -111,7 +111,7 @@ function AppContent() {
                         </ProtectedRoute>
                     }
                 />
-                {/* Payment Route */}
+
                 <Route
                     path="/payment/:orderId"
                     element={

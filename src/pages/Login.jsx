@@ -19,7 +19,7 @@ export default function Login({ onClose, toggleModal }) {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            const res = await api.post("/api/token/", { username, password });
+            const res = await api.post("/auth/jwt/create/", { username, password });
             login(res.data.access, res.data.refresh);
             setSuccess("Login Successful!");
             setTimeout(() => {
