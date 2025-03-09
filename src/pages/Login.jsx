@@ -1,10 +1,9 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api.js";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants.js";
 import { AuthContext } from "../contexts/AuthContext.jsx";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function Login({ onClose, toggleModal }) {
     const [username, setUsername] = useState("");
@@ -25,7 +24,6 @@ export default function Login({ onClose, toggleModal }) {
             setTimeout(() => {
                 setSuccess("");
                 onClose();
-                // Retrieve the intended path from localStorage (set earlier in ProtectedRoute)
                 const next = localStorage.getItem("next") || "/";
                 localStorage.removeItem("next");
                 nav(next);
@@ -36,6 +34,11 @@ export default function Login({ onClose, toggleModal }) {
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleForgotPassword = () => {
+        onClose(); // Close the modal
+        nav("/forgot-password"); // Navigate to Forgot Password page
     };
 
     return (
@@ -49,9 +52,9 @@ export default function Login({ onClose, toggleModal }) {
                                 Username
                             </label>
                             <div className="input-group">
-                <span className="input-group-text bg-transparent">
-                  <i className="bi bi-person-fill text-primary"></i>
-                </span>
+                                <span className="input-group-text bg-transparent">
+                                    <i className="bi bi-person-fill text-primary"></i>
+                                </span>
                                 <input
                                     type="text"
                                     className="form-control form-control-lg border-start-0"
@@ -64,14 +67,14 @@ export default function Login({ onClose, toggleModal }) {
                             </div>
                         </div>
 
-                        <div className="mb-4">
+                        <div className="mb-2">
                             <label htmlFor="password" className="form-label text-muted">
                                 Password
                             </label>
                             <div className="input-group">
-                <span className="input-group-text bg-transparent">
-                  <i className="bi bi-lock-fill text-primary"></i>
-                </span>
+                                <span className="input-group-text bg-transparent">
+                                    <i className="bi bi-lock-fill text-primary"></i>
+                                </span>
                                 <input
                                     type="password"
                                     className="form-control form-control-lg border-start-0"
@@ -82,6 +85,17 @@ export default function Login({ onClose, toggleModal }) {
                                     style={{ transition: "all 0.3s" }}
                                 />
                             </div>
+                        </div>
+
+                        {/* Forgot Password Link */}
+                        <div className="text-end mb-4">
+                            <button
+                                className="btn btn-link text-decoration-none p-0 text-primary fw-semibold"
+                                onClick={handleForgotPassword}
+                                type="button"
+                            >
+                                Forgot Password?
+                            </button>
                         </div>
 
                         <button
@@ -112,6 +126,7 @@ export default function Login({ onClose, toggleModal }) {
                             {success}
                         </div>
                     )}
+
                     <p className="text-center mt-3">
                         Don't have an account?{" "}
                         <button className="btn btn-link p-0" onClick={toggleModal}>
@@ -120,13 +135,9 @@ export default function Login({ onClose, toggleModal }) {
                     </p>
                 </div>
             </div>
+
             <style>
                 {`
-          @keyframes gradientShift {
-              0% { background-position: 0% 50%; }
-              50% { background-position: 100% 50%; }
-              100% { background-position: 0% 50%; }
-          }
           .card {
               border: none;
               border-radius: 20px;

@@ -18,6 +18,7 @@ import { AuthProvider } from "./contexts/AuthContext.jsx";
 import { CartProvider } from "./contexts/CartContext.jsx";
 import Messages from "./components/Messages.jsx";
 import Register from "./pages/Register.jsx";
+import ForgotPassword from "./components/forgotPassword.jsx";
 import Modal from "./components/Modal.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
 import ProductsDetail from "./components/ProductsDetail.jsx";
@@ -69,6 +70,8 @@ function AppContent() {
                 />
                 <Route path="/store/products/:id" element={<ProductsDetail />} />
                 <Route path="/products" element={<ProductsList />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+
 
                 {/* Protected Routes */}
                 <Route
