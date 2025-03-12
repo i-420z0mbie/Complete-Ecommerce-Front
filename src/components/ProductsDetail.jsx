@@ -335,10 +335,9 @@ const ProductsDetail = () => {
                     )}
                     <div className="alert alert-info">
                         <i className="bi bi-truck me-2"></i>
-                        Free shipping on orders over GH₵500
+                        Fast Shipping
                     </div>
 
-                    {/* Checkout form for "Buy Now" */}
                     {showCheckoutForm && (
                         <div className="mt-4 p-3 border rounded">
                             <h5>Enter Shipping Details</h5>
@@ -404,7 +403,7 @@ const ProductsDetail = () => {
                         <div className="lead" dangerouslySetInnerHTML={{ __html: product.description }} />
                     </section>
 
-                    {/* Reviews Section */}
+                     Reviews Section
                     <section ref={sectionRefs.reviews} className="mb-5">
                         <h2 className="mb-4">Customer Reviews</h2>
                         {product.reviews && product.reviews.length > 0 ? (
@@ -514,7 +513,7 @@ const ProductsDetail = () => {
                                                 )}
                                             </button>
                                         </div>
-                                        {/* Conditionally Render Contact Details */}
+
                                         {showContactDetails && product.store?.contact_info && (
                                             <div className="mt-3 p-3 border rounded">
                                                 <h5>Contact Details</h5>
@@ -531,14 +530,7 @@ const ProductsDetail = () => {
                                         <i className="bi bi-truck fs-5 text-success"></i>
                                         <div>
                                             <small className="d-block text-muted">Fast Shipping</small>
-                                            <small className="text-success">Free on orders over GH₵500</small>
-                                        </div>
-                                    </div>
-                                    <div className="d-flex align-items-center gap-2">
-                                        <i className="bi bi-arrow-counterclockwise fs-5 text-primary"></i>
-                                        <div>
-                                            <small className="d-block text-muted">Returns</small>
-                                            <small className="text-primary">30-Day Free Returns</small>
+                                            <small className="text-success">Fast Shipping AnyWhere, AnyDay</small>
                                         </div>
                                     </div>
                                     <div className="d-flex align-items-center gap-2">
@@ -553,11 +545,7 @@ const ProductsDetail = () => {
                         </div>
                     </section>
 
-                    {/* Related Posts Section */}
-                    <section ref={sectionRefs.relatedPosts} className="mb-5">
-                        <h2 className="mb-4">Related Posts</h2>
-                        <p>Related posts go here.</p>
-                    </section>
+
                 </div>
             </div>
 

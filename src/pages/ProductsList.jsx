@@ -13,13 +13,31 @@ export default function ProductsList() {
     const location = useLocation();
     const nav = useNavigate();
 
+    // Render stars for product rating (ratings out of 5)
+    const renderStars = (rating) => {
+        const starStyle = { fontSize: "0.8rem" };
+        const stars = [];
+        for (let i = 1; i <= 5; i++) {
+            if (rating >= i) {
+                stars.push(<i key={i} className="bi bi-star-fill text-warning" style={starStyle}></i>);
+            } else if (rating >= i - 0.5) {
+                stars.push(<i key={i} className="bi bi-star-half text-warning" style={starStyle}></i>);
+            } else {
+                stars.push(<i key={i} className="bi bi-star text-warning" style={starStyle}></i>);
+            }
+        }
+        return stars;
+    };
+
     // Fetch products based on query params
     useEffect(() => {
         const fetchProducts = async () => {
             setIsLoading(true);
             try {
                 const res = await api.get(`/store/products/${location.search}`);
-                setProducts(res.data);
+                // Randomize the products array using React
+                const shuffledProducts = [...res.data].sort(() => Math.random() - 0.5);
+                setProducts(shuffledProducts);
             } catch (err) {
                 setError("Error fetching products!");
                 console.error(err);
@@ -76,22 +94,6 @@ export default function ProductsList() {
     // Helper to check if a product is already in the wishlist
     const isInWishlist = (productId) => {
         return wishlist.some(item => item.product === productId);
-    };
-
-    // Render stars for product rating (ratings out of 5)
-    const renderStars = (rating) => {
-        const starStyle = { fontSize: "0.8rem" };
-        const stars = [];
-        for (let i = 1; i <= 5; i++) {
-            if (rating >= i) {
-                stars.push(<i key={i} className="bi bi-star-fill text-warning" style={starStyle}></i>);
-            } else if (rating >= i - 0.5) {
-                stars.push(<i key={i} className="bi bi-star-half text-warning" style={starStyle}></i>);
-            } else {
-                stars.push(<i key={i} className="bi bi-star text-warning" style={starStyle}></i>);
-            }
-        }
-        return stars;
     };
 
     if (isLoading) {
@@ -177,7 +179,6 @@ export default function ProductsList() {
                                 )}
                             </div>
 
-
                             <div className="image-container overflow-hidden position-relative" style={{ height: "320px" }}>
                                 {product.images && product.images.length > 0 ? (
                                     <motion.img
@@ -195,7 +196,6 @@ export default function ProductsList() {
                                 )}
                                 <div className="gradient-overlay" />
                             </div>
-
 
                             <div className="card-body position-relative bg-light">
                                 <div

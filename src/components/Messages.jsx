@@ -12,6 +12,10 @@ const Messages = () => {
     const [newMessage, setNewMessage] = useState("");
     const [receiver, setReceiver] = useState(""); // Holds either a store name (for customers) or a customer ID (for store owners)
 
+    // New states for receiver suggestions and loading indicator
+    const [receiverSuggestions, setReceiverSuggestions] = useState([]);
+    const [receiverLoading, setReceiverLoading] = useState(false);
+
     // Fetch messages from the backend
     const fetchMessages = async () => {
         try {
@@ -29,6 +33,34 @@ const Messages = () => {
         const intervalId = setInterval(fetchMessages, 10000);
         return () => clearInterval(intervalId);
     }, []);
+
+    // Handle suggestions for receiver input (only for customers)
+    useEffect(() => {
+        let isMounted = true;
+        // Only fetch suggestions if the user is not a store owner and receiver field is non-empty
+        if (receiver && (!user || !user.store)) {
+            setReceiverLoading(true);
+            api.get(`/store/stores/?search=${encodeURIComponent(receiver)}`)
+                .then((response) => {
+                    if (isMounted) {
+                        setReceiverSuggestions(response.data);
+                    }
+                })
+                .catch((err) => {
+                    console.error("Error fetching store suggestions:", err);
+                })
+                .finally(() => {
+                    if (isMounted) {
+                        setReceiverLoading(false);
+                    }
+                });
+        } else {
+            setReceiverSuggestions([]);
+        }
+        return () => {
+            isMounted = false;
+        };
+    }, [receiver, user]);
 
     // Handle sending a new message
     const handleSendMessage = async (e) => {
@@ -48,7 +80,7 @@ const Messages = () => {
                     content: newMessage,
                 };
             } else {
-
+                // Customer sending message to a store.
                 const storeSearchResponse = await api.get(
                     `/store/stores/?search=${encodeURIComponent(receiver)}`
                 );
@@ -133,8 +165,8 @@ const Messages = () => {
                                         <div className="message-header">
                                             <span className="sender-name">{msg.sender}</span>
                                             <span className="message-time">
-                        {new Date(msg.timestamp).toLocaleTimeString()}
-                      </span>
+                                                {new Date(msg.timestamp).toLocaleTimeString()}
+                                            </span>
                                             {!msg.is_read && (
                                                 <motion.button
                                                     whileHover={{ scale: 1.1 }}
@@ -160,12 +192,9 @@ const Messages = () => {
                 </motion.div>
 
                 {/* Compose Message Panel */}
-                <motion.div className="compose-panel" initial={{ x: 100 }} animate={{ x: 0 }}>
+                <motion.div className="compose-panel redesigned" initial={{ x: 100 }} animate={{ x: 0 }}>
                     <div className="compose-header">
                         <h2>New Message</h2>
-                        <div className="message-actions">
-
-                        </div>
                     </div>
 
                     <form onSubmit={handleSendMessage} className="message-form">
@@ -178,24 +207,46 @@ const Messages = () => {
                                 required
                             />
                             <label htmlFor="receiver">{receiverLabel}</label>
+                            {/* Suggestions dropdown for store names (only for customers) */}
+                            {(!user || !user.store) && receiver && (
+                                <div className="receiver-suggestions">
+                                    {receiverLoading ? (
+                                        <div className="loading-spinner">
+                                            <div className="spinner-border spinner-border-sm" role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        receiverSuggestions.map((store) => (
+                                            <div
+                                                key={store.id}
+                                                className="suggestion-item"
+                                                onClick={() => setReceiver(store.name)}
+                                            >
+                                                {store.name}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         <div className="form-group">
-              <textarea
-                  id="message"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Write your message here..."
-                  className="message-input"
-                  rows="5"
-                  required
-              ></textarea>
+                            <textarea
+                                id="message"
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                placeholder="Write your message here..."
+                                className="message-input"
+                                rows="5"
+                                required
+                            ></textarea>
                         </div>
 
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="send-button"
+                            className="send-button redesigned-send"
                             type="submit"
                         >
                             <FiSend className="send-icon" />
@@ -211,6 +262,44 @@ const Messages = () => {
                     {error}
                 </motion.div>
             )}
+
+            {/* Additional styling for new design modifications */}
+            <style>
+                {`
+                    .compose-panel.redesigned {
+                        background: #f9f9f9;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                        padding: 20px;
+                    }
+                    .send-button.redesigned-send {
+                        background: linear-gradient(45deg, #667eea, #764ba2);
+                        color: #fff;
+                        border: none;
+                        border-radius: 50px;
+                        padding: 12px 20px;
+                        font-size: 1rem;
+                    }
+                    .send-button.redesigned-send:hover {
+                        background: linear-gradient(45deg, #5570e0, #684a9e);
+                    }
+                    .receiver-suggestions {
+                        background: #fff;
+                        border: 1px solid #ccc;
+                        border-radius: 4px;
+                        margin-top: 5px;
+                        max-height: 150px;
+                        overflow-y: auto;
+                    }
+                    .suggestion-item {
+                        padding: 5px 10px;
+                        cursor: pointer;
+                    }
+                    .suggestion-item:hover {
+                        background: #f0f0f0;
+                    }
+                `}
+            </style>
         </div>
     );
 };

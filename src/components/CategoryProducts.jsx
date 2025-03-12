@@ -46,7 +46,9 @@ export default function CategoryProducts() {
                 const res = await api.get(`/store/products/${query}`);
 
                 const data = Array.isArray(res.data) ? res.data : res.data.results;
-                setProducts(data);
+                // Randomize the products array using React
+                const randomizedData = [...data].sort(() => Math.random() - 0.5);
+                setProducts(randomizedData);
             } catch (err) {
                 setError("Failed to fetch products.");
                 console.error(err);
@@ -158,7 +160,6 @@ export default function CategoryProducts() {
                                 <div className="gradient-overlay" />
                             </div>
 
-
                             <div className="card-body position-relative bg-light">
                                 <div
                                     className="position-absolute top-0 start-0 w-100 bg-primary"
@@ -180,7 +181,7 @@ export default function CategoryProducts() {
                                         <span>
                       {renderStars(product.average_rating)}{" "}
                                             <small>({product.reviews?.length || 0} reviews)</small>
-                    </span>
+                                        </span>
                                     )}
                                 </div>
                                 <div className="d-flex justify-content-between align-items-center">

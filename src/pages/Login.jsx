@@ -28,9 +28,22 @@ export default function Login({ onClose, toggleModal }) {
                 localStorage.removeItem("next");
                 nav(next);
             }, 1000);
-        } catch (error) {
-            setError("Invalid username or password");
-            console.error("Error logging in", error);
+        } catch (err) {
+            if (err.response && err.response.data) {
+                const errors = err.response.data;
+                let errorMessages = [];
+                for (const key in errors) {
+                    if (errors.hasOwnProperty(key)) {
+                        errorMessages.push(
+                            `${key}: ${Array.isArray(errors[key]) ? errors[key].join(" ") : errors[key]}`
+                        );
+                    }
+                }
+                setError(errorMessages.join(" | "));
+            } else {
+                setError("Invalid username or password");
+            }
+            console.error("Error logging in", err);
         } finally {
             setIsSubmitting(false);
         }

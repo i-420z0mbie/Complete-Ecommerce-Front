@@ -95,7 +95,8 @@ const Navbar = ({ openModal }) => {
     // Debounce and fetch suggestions as the user types
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            if (searchQuery.trim().length > 1) {
+            // Changed condition: allow suggestions for single letter searches
+            if (searchQuery.trim().length > 0) {
                 setSearchLoading(true);
                 fetchSuggestions(searchQuery).then(() => setSearchLoading(false));
             } else {
@@ -107,7 +108,9 @@ const Navbar = ({ openModal }) => {
 
     const fetchSuggestions = async (query) => {
         try {
-            const response = await api.get(`/store/products/?search=${query}`);
+            // If query equals "xbox" (case-insensitive), change it to "x-box"
+            const modifiedQuery = query.trim().toLowerCase() === "xbox" ? "x-box" : query;
+            const response = await api.get(`/store/products/?search=${modifiedQuery}`);
             setSuggestions(response.data);
         } catch (err) {
             console.error("Error fetching suggestions:", err);
@@ -225,7 +228,6 @@ const Navbar = ({ openModal }) => {
 
     return (
         <nav className="navbar navbar-dark bg-dark ali-nav">
-            {/* Mobile Top Row */}
             <div className="container-fluid mobile-top-row">
                 <button
                     className="navbar-toggler"
@@ -237,7 +239,7 @@ const Navbar = ({ openModal }) => {
                 </button>
 
                 <a className="navbar-brand" href="/">
-                    z0mbified
+                    NaoMall | Shopping
                 </a>
 
                 <div className="mobile-icons">
@@ -250,7 +252,6 @@ const Navbar = ({ openModal }) => {
 
             {/* Mobile Menu */}
             <div className={`mobile-menu ${showMobileMenu ? "show" : ""}`}>
-                {/* Search Bar */}
                 <form className="mobile-search" onSubmit={handleSearchSubmit}>
                     <input
                         type="search"
@@ -268,29 +269,21 @@ const Navbar = ({ openModal }) => {
                     )}
                 </form>
 
-                {/* Navigation Links */}
                 <div className="mobile-nav-links">
                     <a href="/products" onClick={toggleMobileMenu}>
                         All Products
                     </a>
-                    <a href="/category/bundle-deals" onClick={toggleMobileMenu}>
-                        Bundle Deals
-                    </a>
                     <a href="/category/weekly-sensation" onClick={toggleMobileMenu}>
                         Weekly Sensation
                     </a>
-                    <a href="/category/top-brands" onClick={toggleMobileMenu}>
-                        Top Brands
-                    </a>
                     <a href="/category/directors-pick" onClick={toggleMobileMenu}>
-                        Director's Pick
+                        Director`s Pick
                     </a>
-                    <a href="/category/mobile-phones-communication" onClick={toggleMobileMenu}>
+                    <a href="/category/mobile-phones-and-tablets" onClick={toggleMobileMenu}>
                         Phones & Telecom
                     </a>
                 </div>
 
-                {/* Account Section */}
                 <div className="mobile-account">
                     {isAuthenticated ? (
                         <>
@@ -332,7 +325,7 @@ const Navbar = ({ openModal }) => {
                 <div className="container-fluid flex-column p-0">
                     <div className="top-row d-flex align-items-center w-100">
                         <a className="navbar-brand ms-3" href="/">
-                            z0mbified: The store
+                            NaoMall | Shopping
                         </a>
                         <form
                             className="search-container mx-auto position-relative"
@@ -552,18 +545,8 @@ const Navbar = ({ openModal }) => {
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link text-white" href="/category/bundle-deals">
-                                    Bundle deals
-                                </a>
-                            </li>
-                            <li className="nav-item">
                                 <a className="nav-link text-white" href="/category/weekly-sensation">
                                     Weekly sensation
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link text-white" href="/category/top-brands">
-                                    Top Brands
                                 </a>
                             </li>
                             <li className="nav-item">
@@ -572,7 +555,7 @@ const Navbar = ({ openModal }) => {
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link text-white" href="/category/mobile-phones-communication">
+                                <a className="nav-link text-white" href="/category/mobile-phones-and-tablets">
                                     Phones & Telecom
                                 </a>
                             </li>
