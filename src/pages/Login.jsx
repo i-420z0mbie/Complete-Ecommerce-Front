@@ -16,9 +16,14 @@ export default function Login({ onClose, toggleModal }) {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError(null);
         setIsSubmitting(true);
         try {
-            const res = await api.post("/auth/jwt/create/", { username, password });
+            const res = await api.post("/auth/jwt/create/", { username, password }, { skipAuthRefresh: true });
+            // If the response contains an error detail, throw an error to trigger the catch block
+            if (res.data.detail) {
+                throw new Error(res.data.detail);
+            }
             login(res.data.access, res.data.refresh);
             setSuccess("Login Successful!");
             setTimeout(() => {
@@ -29,20 +34,30 @@ export default function Login({ onClose, toggleModal }) {
                 nav(next);
             }, 1000);
         } catch (err) {
+            let message = "";
             if (err.response && err.response.data) {
                 const errors = err.response.data;
                 let errorMessages = [];
                 for (const key in errors) {
                     if (errors.hasOwnProperty(key)) {
-                        errorMessages.push(
-                            `${key}: ${Array.isArray(errors[key]) ? errors[key].join(" ") : errors[key]}`
-                        );
+                        let errMsg = Array.isArray(errors[key]) ? errors[key].join(" ") : errors[key];
+                        // Update the message to be more user-friendly if no account is found
+                        if (errMsg.includes("No active account")) {
+                            errMsg = "No account found with those credentials. Please check your username and password.";
+                        }
+                        errorMessages.push(`${key}: ${errMsg}`);
                     }
                 }
-                setError(errorMessages.join(" | "));
+                message = errorMessages.join(" | ");
+            } else if (err.message) {
+                // Use the thrown error message if available
+                message = err.message.includes("No active account")
+                    ? "No account found with those credentials. Please check your username and password."
+                    : err.message;
             } else {
-                setError("Invalid username or password");
+                message = "No account found with those credentials. Please check your username and password.";
             }
+            setError(message);
             console.error("Error logging in", err);
         } finally {
             setIsSubmitting(false);

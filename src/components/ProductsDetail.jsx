@@ -231,12 +231,12 @@ const ProductsDetail = () => {
             <div className="row g-4 mb-5">
                 {/* Image Gallery */}
                 <div className="col-md-6">
-                    <div className="ratio ratio-1x1 bg-light rounded-3 overflow-hidden">
+                    <div className="bg-light rounded-3 overflow-hidden d-flex justify-content-center align-items-center">
                         {selectedImage ? (
                             <img
                                 src={selectedImage}
                                 alt={product.name}
-                                className="img-fluid object-fit-md-contain"
+                                style={{ maxWidth: "100%", height: "auto" }}
                                 loading="lazy"
                             />
                         ) : (
@@ -335,7 +335,7 @@ const ProductsDetail = () => {
                     )}
                     <div className="alert alert-info">
                         <i className="bi bi-truck me-2"></i>
-                        Fast Shipping
+                        Fast Shipping | Fast Delivery
                     </div>
 
                     {showCheckoutForm && (
@@ -343,7 +343,7 @@ const ProductsDetail = () => {
                             <h5>Enter Shipping Details</h5>
                             <div className="mb-3">
                                 <label htmlFor="shippingAddress" className="form-label">
-                                    Shipping Address
+                                    Shipping Address / Delivery Address
                                 </label>
                                 <input
                                     type="text"
@@ -403,7 +403,7 @@ const ProductsDetail = () => {
                         <div className="lead" dangerouslySetInnerHTML={{ __html: product.description }} />
                     </section>
 
-                     Reviews Section
+                    Reviews Section
                     <section ref={sectionRefs.reviews} className="mb-5">
                         <h2 className="mb-4">Customer Reviews</h2>
                         {product.reviews && product.reviews.length > 0 ? (
@@ -489,8 +489,8 @@ const ProductsDetail = () => {
                                         <div className="d-flex align-items-center gap-3 mb-2">
                                             <h3 className="mb-0">{product.store?.name || "Official Store"}</h3>
                                             <span className="badge bg-primary">
-                        <i className="bi bi-patch-check-fill me-2"></i>Verified
-                      </span>
+                                                <i className="bi bi-patch-check-fill me-2"></i>Verified
+                                            </span>
                                         </div>
                                         {/* Store Description */}
                                         {product.store?.description && (
@@ -544,8 +544,6 @@ const ProductsDetail = () => {
                             </div>
                         </div>
                     </section>
-
-
                 </div>
             </div>
 

@@ -13,28 +13,28 @@ const Hero = () => {
                 title: "Computers & Accessories",
                 description: "Everything you need in one place",
                 image: "/hero_images/accessories.jpg",
-                link: "/category/electronics",
+                link: "/category/computer-office-education",
             },
             {
                 id: 2,
                 title: "Online Shopping Made Easy!",
                 description: "Comfort and style at great prices",
                 image: "/hero_images/ecommerce-statistics.jpg",
-                link: "/category/furniture",
+                link: "/products",
             },
             {
                 id: 3,
                 title: "Best Deals",
                 description: "Build Your Own Rig With Us. Don't Miss Out!",
                 image: "/hero_images/hardware.jpg",
-                link: "/deals",
+                link: "category/deals",
             },
             {
                 id: 4,
                 title: "Jewelry & Watches",
                 description: "Find what makes you glow!",
                 image: "/hero_images/jewellry.jpg",
-                link: "/deals",
+                link: "category/jewelry-watches",
             },
         ];
         setHeroImages(staticHeroImages);

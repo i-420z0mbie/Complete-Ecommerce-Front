@@ -39,34 +39,38 @@ const SearchResults = () => {
             ) : products.length > 0 ? (
                 <div className="row">
                     {products.map((product) => (
-                        <div key={product.id} className="col-md-4 mb-3">
-                            <div className="card h-100">
-                                {/* Image Gallery */}
-                                <div className="ratio ratio-1x1 bg-light rounded-3 overflow-hidden">
+                        <div key={product.id} className="col-xl-4 col-lg-4 col-md-6 mb-3">
+                            <div
+                                className="card h-100 shadow-lg border-0 overflow-hidden product-card hover-effect"
+                                style={{ borderRadius: "20px", cursor: "pointer", minWidth: "350px" }}
+                            >
+                                {/* Image Container */}
+                                <div className="image-container overflow-hidden position-relative" style={{ height: "320px" }}>
                                     {product.images && product.images.length > 0 ? (
                                         <img
                                             src={product.images[0].image}
                                             alt={product.name}
-                                            className="img-fluid object-fit-md-contain"
+                                            className="img-fluid h-100 w-100 object-fit-contain"
                                             loading="lazy"
                                         />
                                     ) : (
-                                        <div className="d-flex align-items-center justify-content-center text-muted">
-                                            <i className="bi bi-image fs-1"></i>
+                                        <div className="h-100 w-100 bg-gradient-secondary d-flex align-items-center justify-content-center">
+                                            <span className="text-white">📷 Image Coming Soon!</span>
                                         </div>
                                     )}
+                                    <div className="gradient-overlay" />
                                 </div>
 
                                 {/* Product Info */}
-                                <div className="card-body">
-                                    <h5 className="card-title">{product.name}</h5>
+                                <div className="card-body bg-light">
+                                    <h5 className="card-title fw-bold text-truncate">{product.name}</h5>
                                     <p className="card-text">
                                         GH₵{" "}
                                         {product.unit_price
                                             ? parseFloat(product.unit_price).toFixed(2)
                                             : "N/A"}
                                     </p>
-                                    <a href={`store/products/${product.id}`} className="btn btn-primary">
+                                    <a href={`/store/products/${product.id}`} className="btn btn-primary">
                                         View Product
                                     </a>
                                 </div>
@@ -77,6 +81,16 @@ const SearchResults = () => {
             ) : (
                 <p>No products found.</p>
             )}
+            <style jsx="true">{`
+                .gradient-overlay {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 40%;
+                    background: linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                }
+            `}</style>
         </div>
     );
 };

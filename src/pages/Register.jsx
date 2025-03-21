@@ -68,7 +68,12 @@ export default function Register({ onClose, toggleModal }) {
                 let errorMessages = [];
                 for (const key in errors) {
                     if (errors.hasOwnProperty(key)) {
-                        errorMessages.push(`${key}: ${errors[key].join(" ")}`);
+                        let message = Array.isArray(errors[key]) ? errors[key].join(" ") : errors[key];
+                        // Update the message to be more user-friendly if account exists
+                        if (message.toLowerCase().includes("already exists")) {
+                            message = "An account with these details already exists. Please log in instead.";
+                        }
+                        errorMessages.push(`${key}: ${message}`);
                     }
                 }
                 setError(errorMessages.join(" | "));

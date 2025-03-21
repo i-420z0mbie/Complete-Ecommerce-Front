@@ -38,6 +38,7 @@ const Navbar = ({ openModal }) => {
 
     const toggleMobileMenu = () => {
         setShowMobileMenu(!showMobileMenu);
+        document.body.classList.toggle('mobile-menu-open', !showMobileMenu);
     };
 
     // Custom hover handlers allowing for an optional delay parameter.
@@ -262,6 +263,29 @@ const Navbar = ({ openModal }) => {
                     <button type="submit">
                         <i className="bi bi-search"></i>
                     </button>
+                    {/* Add suggestions list for mobile */}
+                    {suggestions.length > 0 && (
+                        <ul
+                            className="suggestions-list list-group position-absolute"
+                            style={{
+                                top: "100%",
+                                left: 0,
+                                right: 0,
+                                zIndex: 1000,
+                            }}
+                        >
+                            {suggestions.slice(0, 5).map((suggestion) => (
+                                <li
+                                    key={suggestion.id}
+                                    className="list-group-item list-group-item-action"
+                                    onClick={() => handleSuggestionClick(suggestion)}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    {suggestion.name}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                     {searchLoading && (
                         <div className="spinner-border spinner-border-sm text-primary ms-2" role="status">
                             <span className="visually-hidden">Loading...</span>
@@ -273,11 +297,11 @@ const Navbar = ({ openModal }) => {
                     <a href="/products" onClick={toggleMobileMenu}>
                         All Products
                     </a>
-                    <a href="/category/weekly-sensation" onClick={toggleMobileMenu}>
-                        Weekly Sensation
+                    <a href="/category/deals/pre-built-rigs" onClick={toggleMobileMenu}>
+                        Pre-Built Rigs
                     </a>
-                    <a href="/category/directors-pick" onClick={toggleMobileMenu}>
-                        Director`s Pick
+                    <a href="/category/deals/second-hand-deals" onClick={toggleMobileMenu}>
+                        Second Hand Deals
                     </a>
                     <a href="/category/mobile-phones-and-tablets" onClick={toggleMobileMenu}>
                         Phones & Telecom
@@ -545,13 +569,13 @@ const Navbar = ({ openModal }) => {
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link text-white" href="/category/weekly-sensation">
-                                    Weekly sensation
+                                <a className="nav-link text-white" href="/category/deals/Pre-Built-Rigs">
+                                    Pre-Built Rigs
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link text-white" href="/category/directors-pick">
-                                    Director's Pick
+                                <a className="nav-link text-white" href="/category/deals/second-hand-deals">
+                                    Second Hand Deals
                                 </a>
                             </li>
                             <li className="nav-item">
@@ -568,3 +592,4 @@ const Navbar = ({ openModal }) => {
 };
 
 export default Navbar;
+

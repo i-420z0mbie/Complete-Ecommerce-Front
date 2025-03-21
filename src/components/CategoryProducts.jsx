@@ -46,9 +46,7 @@ export default function CategoryProducts() {
                 const res = await api.get(`/store/products/${query}`);
 
                 const data = Array.isArray(res.data) ? res.data : res.data.results;
-                // Randomize the products array using React
-                const randomizedData = [...data].sort(() => Math.random() - 0.5);
-                setProducts(randomizedData);
+                setProducts(data);
             } catch (err) {
                 setError("Failed to fetch products.");
                 console.error(err);
@@ -160,6 +158,7 @@ export default function CategoryProducts() {
                                 <div className="gradient-overlay" />
                             </div>
 
+
                             <div className="card-body position-relative bg-light">
                                 <div
                                     className="position-absolute top-0 start-0 w-100 bg-primary"
@@ -171,19 +170,19 @@ export default function CategoryProducts() {
                                         ? product.description.slice(0, 80) + "..."
                                         : "No description available."}
                                 </p>
-                                <div className="mb-2">
-                                    {product.inventory > 0 ? (
-                                        <span className="badge bg-success me-2">In Stock: {product.inventory}</span>
-                                    ) : (
-                                        <span className="badge bg-danger me-2">Out of Stock</span>
-                                    )}
-                                    {product.average_rating != null && (
-                                        <span>
-                      {renderStars(product.average_rating)}{" "}
-                                            <small>({product.reviews?.length || 0} reviews)</small>
-                                        </span>
-                                    )}
-                                </div>
+                    {/*            <div className="mb-2">*/}
+                    {/*                {product.inventory > 0 ? (*/}
+                    {/*                    <span className="badge bg-success me-2">In Stock: {product.inventory}</span>*/}
+                    {/*                ) : (*/}
+                    {/*                    <span className="badge bg-danger me-2">Out of Stock</span>*/}
+                    {/*                )}*/}
+                    {/*                {product.average_rating != null && (*/}
+                    {/*                    <span>*/}
+                    {/*  {renderStars(product.average_rating)}{" "}*/}
+                    {/*                        <small>({product.reviews?.length || 0} reviews)</small>*/}
+                    {/*</span>*/}
+                    {/*                )}*/}
+                    {/*            </div>*/}
                                 <div className="d-flex justify-content-between align-items-center">
                                     <p className="card-text fs-4 fw-bold text-gradient-primary mb-0">
                                         GH₵ {product.unit_price}

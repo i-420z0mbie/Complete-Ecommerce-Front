@@ -1,6 +1,6 @@
 // src/App.jsx
-import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, useSearchParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useSearchParams, useLocation } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -26,10 +26,19 @@ import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 
-
 function AppContent() {
     const [modalType, setModalType] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
+    const location = useLocation();
+
+    // Google Analytics page view tracking
+    useEffect(() => {
+        if (window.gtag) {
+            window.gtag('config', 'G-55GQQY2MK0', {
+                page_path: location.pathname,
+            });
+        }
+    }, [location]);
 
     const openModal = (type) => {
         if (searchParams.has("dismissed")) {
@@ -63,7 +72,6 @@ function AppContent() {
                 <Route path="/" element={<Home />} />
                 <Route path="/search" element={<SearchResults />} />
 
-
                 <Route
                     path="/category/:categorySlug/:subCategorySlug?/:subSubCategorySlug?"
                     element={<CategoryProducts />}
@@ -71,7 +79,6 @@ function AppContent() {
                 <Route path="/store/products/:id" element={<ProductsDetail />} />
                 <Route path="/products" element={<ProductsList />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
-
 
                 {/* Protected Routes */}
                 <Route
@@ -126,10 +133,7 @@ function AppContent() {
                 <Route path="*" element={<NotFound />} />
             </Routes>
 
-
-
             <Footer />
-
         </>
     );
 }
