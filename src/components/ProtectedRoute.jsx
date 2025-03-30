@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import api from "../api.js";
-import {jwtDecode} from "jwt-decode";
+import jwt_decode from "jwt-decode"; // Corrected import
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../constants";
 
 function ProtectedRoute({ children, openModal }) {
@@ -13,23 +13,31 @@ function ProtectedRoute({ children, openModal }) {
         const auth = async () => {
             const token = localStorage.getItem(ACCESS_TOKEN);
             if (!token) {
-
                 localStorage.setItem("next", location.pathname);
                 setIsAuthorized(false);
                 return;
             }
-            const decoded = jwtDecode(token);
+            let decoded;
+            try {
+                decoded = jwt_decode(token);
+            } catch (e) {
+                // token cannot be decoded, consider it invalid
+                localStorage.setItem("next", location.pathname);
+                setIsAuthorized(false);
+                return;
+            }
             const tokenExpiration = decoded.exp;
             const now = Date.now() / 1000;
             if (tokenExpiration < now) {
+                // Token is expired, so attempt to refresh it using the same endpoint as in our interceptor.
+                const refreshToken = localStorage.getItem(REFRESH_TOKEN);
+                if (!refreshToken) {
+                    localStorage.setItem("next", location.pathname);
+                    setIsAuthorized(false);
+                    return;
+                }
                 try {
-                    const refreshToken = localStorage.getItem(REFRESH_TOKEN);
-                    if (!refreshToken) {
-                        localStorage.setItem("next", location.pathname);
-                        setIsAuthorized(false);
-                        return;
-                    }
-                    const res = await api.post("/refresh/token/", { refresh: refreshToken });
+                    const res = await api.post("/auth/jwt/refresh/", { refresh: refreshToken });
                     if (res.status === 200) {
                         localStorage.setItem(ACCESS_TOKEN, res.data.access);
                         setIsAuthorized(true);
@@ -53,7 +61,6 @@ function ProtectedRoute({ children, openModal }) {
         });
     }, [location]);
 
-
     useEffect(() => {
         if (isAuthorized === false && !modalTriggered && openModal) {
             openModal("login");
@@ -65,7 +72,9 @@ function ProtectedRoute({ children, openModal }) {
         return <div>Loading...</div>;
     }
 
-    return isAuthorized ? children : (
+    return isAuthorized ? (
+        children
+    ) : (
         <div className="container text-center mt-5">
             <h2>You must log in to access this page.</h2>
             <p>Please use the login option from the profile dropdown.</p>

@@ -29,9 +29,14 @@ export default function Login({ onClose, toggleModal }) {
             setTimeout(() => {
                 setSuccess("");
                 onClose();
-                const next = localStorage.getItem("next") || "/";
-                localStorage.removeItem("next");
-                nav(next);
+                // Try to use a "next" route from localStorage; if not, go back one page
+                const next = localStorage.getItem("next");
+                if (next) {
+                    localStorage.removeItem("next");
+                    nav(next);
+                } else {
+                    nav(-1);
+                }
             }, 1000);
         } catch (err) {
             let message = "";

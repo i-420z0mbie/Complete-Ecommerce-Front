@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api";
 import { toast } from "react-toastify";
 import { useCart } from "../contexts/CartContext";
+import { AuthContext } from "../contexts/AuthContext";
 
 const ProductsDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart, cartId } = useCart();
+    const { isAuthenticated } = useContext(AuthContext);
 
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -33,6 +35,11 @@ const ProductsDetail = () => {
 
     // New state for the currently showcased image
     const [selectedImage, setSelectedImage] = useState(null);
+
+    // New state for review submission
+    const [newReview, setNewReview] = useState("");
+    const [newRating, setNewRating] = useState(1);
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
     // Refs for sections (smooth scrolling, etc.)
     const sectionRefs = {
@@ -164,6 +171,38 @@ const ProductsDetail = () => {
         }
     }, [product, quantity, addToCart, showCheckoutForm, shippingAddress, contactInfo, handleConfirmOrder]);
 
+    const handleSubmitReview = useCallback(async () => {
+        if (!isAuthenticated) {
+            alert("You need to log in to submit a review and rating.");
+            return;
+        }
+        if (newReview.trim() === "" || newRating <= 0) {
+            alert("Please provide both a review and a rating.");
+            return;
+        }
+        setIsSubmittingReview(true);
+        try {
+            // Post the review and rating to their separate endpoints
+            await Promise.all([
+                api.post(`/store/products/${id}/reviews/`, { review: newReview }),
+                api.post(`/store/products/${id}/ratings/`, { rating: newRating }),
+            ]);
+            alert("Review submitted and pending verification.");
+            // Clear the form on successful submission
+            setNewReview("");
+            setNewRating(1);
+        } catch (err) {
+            console.error("Error submitting review:", err.response || err.message);
+            if (err.response && err.response.status === 403) {
+                alert(err.response.data.detail || "You must purchase the product before leaving a review.");
+            } else {
+                alert("Failed to submit review. Please try again.");
+            }
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    }, [newReview, newRating, id, isAuthenticated]);
+
     const renderStars = useCallback((rating) => {
         const starStyle = { fontSize: "0.8rem" };
         const stars = [];
@@ -275,7 +314,7 @@ const ProductsDetail = () => {
                     </div>
                     <div className="d-flex align-items-center gap-2 mb-3">
                         {renderStars(product.average_rating)}
-                        <small className="text-muted">({product.reviews?.length || 0} reviews)</small>
+                        <small className="text-muted">({(product.reviews || []).filter(review => review.is_verified).length} reviews)</small>
                     </div>
                     <div className="d-flex flex-wrap gap-3 mb-4">
                         <div className="input-group" style={{ width: "120px" }}>
@@ -403,12 +442,14 @@ const ProductsDetail = () => {
                         <div className="lead" dangerouslySetInnerHTML={{ __html: product.description }} />
                     </section>
 
-                    Reviews Section
+                    {/* Reviews Section */}
                     <section ref={sectionRefs.reviews} className="mb-5">
                         <h2 className="mb-4">Customer Reviews</h2>
-                        {product.reviews && product.reviews.length > 0 ? (
-                            product.reviews.map((review, index) => {
-                                const userRating = product.ratings?.find((rating) => rating.username === review.author);
+                        {product.reviews && product.reviews.filter(review => review.is_verified).length > 0 ? (
+                            product.reviews.filter(review => review.is_verified).map((review, index) => {
+                                const userRating = product.ratings?.find(
+                                    (rating) => rating.username === review.author && rating.is_verified
+                                );
                                 return (
                                     <article key={index} className="card mb-3">
                                         <div className="card-body">
@@ -445,6 +486,55 @@ const ProductsDetail = () => {
                                 No reviews yet. Be the first to review this product!
                             </div>
                         )}
+                    </section>
+
+                    {/* Add Review & Rating Section */}
+                    <section className="mb-5">
+                        <h2 className="mb-4">Add Your Review</h2>
+                        <div className="card p-4 shadow-sm">
+                            <div className="mb-3">
+                                <label htmlFor="newReview" className="form-label">
+                                    Your Review
+                                </label>
+                                <textarea
+                                    id="newReview"
+                                    className="form-control"
+                                    rows="3"
+                                    value={newReview}
+                                    onChange={(e) => setNewReview(e.target.value)}
+                                    placeholder="Write your review here..."
+                                ></textarea>
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label">Your Rating</label>
+                                <div className="d-flex align-items-center">
+                                    <button
+                                        className="btn btn-outline-secondary me-2"
+                                        onClick={() => setNewRating((prev) => Math.max(1, prev - 1))}
+                                    >
+                                        <i className="bi bi-arrow-down"></i>
+                                    </button>
+                                    <div className="fw-bold">{newRating}</div>
+                                    <button
+                                        className="btn btn-outline-secondary ms-2"
+                                        onClick={() => setNewRating((prev) => Math.min(5, prev + 1))}
+                                    >
+                                        <i className="bi bi-arrow-up"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button
+                                className="btn btn-primary"
+                                onClick={handleSubmitReview}
+                                disabled={isSubmittingReview}
+                            >
+                                {isSubmittingReview ? (
+                                    <span className="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></span>
+                                ) : (
+                                    "Submit Review"
+                                )}
+                            </button>
+                        </div>
                     </section>
 
                     {/* Specification Section */}
