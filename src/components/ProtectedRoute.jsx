@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../api.js";
-import jwt_decode from "jwt-decode"; // Corrected import
+import { default as jwt_decode } from "jwt-decode"; // Updated import
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../constants";
 
 function ProtectedRoute({ children, openModal }) {
@@ -21,7 +21,7 @@ function ProtectedRoute({ children, openModal }) {
             try {
                 decoded = jwt_decode(token);
             } catch (e) {
-                // token cannot be decoded, consider it invalid
+                // Token can't be decoded, treat as invalid
                 localStorage.setItem("next", location.pathname);
                 setIsAuthorized(false);
                 return;
@@ -29,7 +29,7 @@ function ProtectedRoute({ children, openModal }) {
             const tokenExpiration = decoded.exp;
             const now = Date.now() / 1000;
             if (tokenExpiration < now) {
-                // Token is expired, so attempt to refresh it using the same endpoint as in our interceptor.
+                // Token expired, attempt to refresh using unified endpoint
                 const refreshToken = localStorage.getItem(REFRESH_TOKEN);
                 if (!refreshToken) {
                     localStorage.setItem("next", location.pathname);
